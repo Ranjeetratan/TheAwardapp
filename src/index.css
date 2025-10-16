@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 4%;
+    --foreground: 210 40% 98%;
+    --card: 210 40% 6%;
+    --card-foreground: 210 40% 98%;
+    --popover: 210 40% 6%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 73 100% 64%;
+    --primary-foreground: 210 40% 4%;
+    --secondary: 210 40% 10%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 210 40% 10%;
+    --muted-foreground: 210 40% 65%;
+    --accent: 73 100% 64%;
+    --accent-foreground: 210 40% 4%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 210 40% 18%;
+    --input: 210 40% 18%;
+    --ring: 73 100% 64%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .input-hover:hover {
+    border-color: hsl(var(--accent) / 0.5);
+  }
+  .input-focus:focus {
+    border-color: hsl(var(--accent));
+    ring-color: hsl(var(--accent) / 0.2);
+    ring-width: 2px;
+  }
+}
