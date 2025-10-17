@@ -174,7 +174,7 @@ export function ProfileForm() {
 
   if (isSubmitted) {
     return (
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -182,20 +182,20 @@ export function ProfileForm() {
             transition={{ duration: 0.5 }}
           >
             <Card className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border-accent/20 shadow-2xl">
-              <CardContent className="p-8 text-center">
+              <CardContent className="p-6 sm:p-8 text-center">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="w-20 h-20 bg-gradient-to-r from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-6"
+                  className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-accent to-accent/80 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6"
                 >
-                  <Check className="w-10 h-10 text-black" />
+                  <Check className="w-8 h-8 sm:w-10 sm:h-10 text-black" />
                 </motion.div>
                 <motion.h3
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
-                  className="text-3xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                  className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
                 >
                   Thanks for submitting!
                 </motion.h3>
@@ -203,7 +203,7 @@ export function ProfileForm() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="text-muted-foreground text-lg"
+                  className="text-muted-foreground text-base sm:text-lg"
                 >
                   We'll review your profile and make it live soon.
                 </motion.p>
@@ -363,11 +363,11 @@ export function ProfileForm() {
             className="space-y-8"
           >
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4">Who are you?</h3>
-              <p className="text-muted-foreground mb-8">Choose your role to customize your profile</p>
+              <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">Who are you?</h3>
+              <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">Choose your role to customize your profile</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -375,16 +375,16 @@ export function ProfileForm() {
                 <Button
                   type="button"
                   variant={role === 'founder' ? 'default' : 'outline'}
-                  className={`w-full h-32 flex flex-col items-center justify-center space-y-3 text-lg transition-all duration-200 ${
+                  className={`w-full h-28 sm:h-32 flex flex-col items-center justify-center space-y-2 sm:space-y-3 text-base sm:text-lg transition-all duration-200 ${
                     role === 'founder' 
                       ? 'bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 shadow-lg shadow-accent/25' 
                       : 'hover:border-accent hover:bg-accent/5 hover:text-white'
                   }`}
                   onClick={() => setRole('founder')}
                 >
-                  <Briefcase className="w-8 h-8" />
+                  <Briefcase className="w-6 h-6 sm:w-8 sm:h-8" />
                   <span className="font-semibold">Founder</span>
-                  <span className="text-sm opacity-80">I have a startup idea/company</span>
+                  <span className="text-xs sm:text-sm opacity-80 text-center px-2">I have a startup idea/company</span>
                 </Button>
               </motion.div>
               
@@ -395,16 +395,16 @@ export function ProfileForm() {
                 <Button
                   type="button"
                   variant={role === 'cofounder' ? 'default' : 'outline'}
-                  className={`w-full h-32 flex flex-col items-center justify-center space-y-3 text-lg transition-all duration-200 ${
+                  className={`w-full h-28 sm:h-32 flex flex-col items-center justify-center space-y-2 sm:space-y-3 text-base sm:text-lg transition-all duration-200 ${
                     role === 'cofounder' 
                       ? 'bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 shadow-lg shadow-accent/25' 
                       : 'hover:border-accent hover:bg-accent/5 hover:text-white'
                   }`}
                   onClick={() => setRole('cofounder')}
                 >
-                  <User className="w-8 h-8" />
+                  <User className="w-6 h-6 sm:w-8 sm:h-8" />
                   <span className="font-semibold">Cofounder</span>
-                  <span className="text-sm opacity-80">I want to join a startup</span>
+                  <span className="text-xs sm:text-sm opacity-80 text-center px-2">I want to join a startup</span>
                 </Button>
               </motion.div>
             </div>
@@ -559,44 +559,44 @@ export function ProfileForm() {
             exit={{ opacity: 0, x: -20 }}
             className="space-y-6"
           >
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold mb-2">Review Your Profile</h3>
-              <p className="text-muted-foreground">Please review your information before submitting</p>
+            <div className="text-center mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2">Review Your Profile</h3>
+              <p className="text-muted-foreground text-sm sm:text-base">Please review your information before submitting</p>
             </div>
 
             <div className="space-y-6">
-              <div className="bg-card/30 rounded-2xl p-6 border border-border/50">
-                <h4 className="font-semibold text-accent mb-4">Basic Information</h4>
-                <div className="flex flex-col md:flex-row gap-6">
+              <div className="bg-card/30 rounded-2xl p-4 sm:p-6 border border-border/50">
+                <h4 className="font-semibold text-accent mb-3 sm:mb-4 text-sm sm:text-base">Basic Information</h4>
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                   <div className="flex-1">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div><span className="text-muted-foreground">Name:</span> {formData.full_name}</div>
-                      <div><span className="text-muted-foreground">Email:</span> {formData.email}</div>
-                      <div><span className="text-muted-foreground">Location:</span> {formData.location}</div>
-                      <div><span className="text-muted-foreground">Availability:</span> {formData.availability}</div>
-                      <div><span className="text-muted-foreground">Looking For:</span> {formData.looking_for}</div>
-                      <div><span className="text-muted-foreground">Role:</span> {role}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                      <div className="break-words"><span className="text-muted-foreground">Name:</span> {formData.full_name}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Email:</span> {formData.email}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Location:</span> {formData.location}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Availability:</span> {formData.availability}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Looking For:</span> {formData.looking_for}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Role:</span> {role}</div>
                       {formData.website_portfolio && (
-                        <div className="md:col-span-2"><span className="text-muted-foreground">Website:</span> {formData.website_portfolio}</div>
+                        <div className="sm:col-span-2 break-all"><span className="text-muted-foreground">Website:</span> {formData.website_portfolio}</div>
                       )}
                       {formData.timezone && (
-                        <div><span className="text-muted-foreground">Timezone:</span> {formData.timezone}</div>
+                        <div className="break-words"><span className="text-muted-foreground">Timezone:</span> {formData.timezone}</div>
                       )}
                     </div>
                     {formData.short_bio && (
-                      <div className="mt-4">
-                        <div className="text-muted-foreground text-sm mb-2">Bio:</div>
-                        <p className="text-sm">{formData.short_bio}</p>
+                      <div className="mt-3 sm:mt-4">
+                        <div className="text-muted-foreground text-xs sm:text-sm mb-2">Bio:</div>
+                        <p className="text-xs sm:text-sm leading-relaxed">{formData.short_bio}</p>
                       </div>
                     )}
                   </div>
                   {headshot && (
-                    <div className="flex-shrink-0">
-                      <div className="text-muted-foreground text-sm mb-2">Headshot:</div>
+                    <div className="flex-shrink-0 self-start">
+                      <div className="text-muted-foreground text-xs sm:text-sm mb-2">Headshot:</div>
                       <img
                         src={URL.createObjectURL(headshot)}
                         alt="Profile headshot"
-                        className="w-24 h-24 rounded-2xl object-cover border-2 border-accent/20"
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-accent/20 mx-auto sm:mx-0"
                       />
                     </div>
                   )}
@@ -604,24 +604,24 @@ export function ProfileForm() {
               </div>
 
               {role === 'founder' && (
-                <div className="bg-card/30 rounded-2xl p-6 border border-border/50">
-                  <h4 className="font-semibold text-accent mb-4">Startup Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span className="text-muted-foreground">Startup:</span> {formData.startup_name}</div>
-                    <div><span className="text-muted-foreground">Stage:</span> {formData.startup_stage}</div>
-                    <div><span className="text-muted-foreground">Industry:</span> {formData.industry}</div>
+                <div className="bg-card/30 rounded-2xl p-4 sm:p-6 border border-border/50">
+                  <h4 className="font-semibold text-accent mb-3 sm:mb-4 text-sm sm:text-base">Startup Information</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                    <div className="break-words"><span className="text-muted-foreground">Startup:</span> {formData.startup_name}</div>
+                    <div className="break-words"><span className="text-muted-foreground">Stage:</span> {formData.startup_stage}</div>
+                    <div className="break-words"><span className="text-muted-foreground">Industry:</span> {formData.industry}</div>
                   </div>
                 </div>
               )}
 
               {role === 'cofounder' && (
-                <div className="bg-card/30 rounded-2xl p-6 border border-border/50">
-                  <h4 className="font-semibold text-accent mb-4">Skills & Experience</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div><span className="text-muted-foreground">Skills:</span> {formData.skills_expertise}</div>
-                    <div><span className="text-muted-foreground">Experience:</span> {formData.experience_level}</div>
+                <div className="bg-card/30 rounded-2xl p-4 sm:p-6 border border-border/50">
+                  <h4 className="font-semibold text-accent mb-3 sm:mb-4 text-sm sm:text-base">Skills & Experience</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                    <div className="break-words"><span className="text-muted-foreground">Skills:</span> {formData.skills_expertise}</div>
+                    <div className="break-words"><span className="text-muted-foreground">Experience:</span> {formData.experience_level}</div>
                     {formData.industry_interests && (
-                      <div><span className="text-muted-foreground">Interests:</span> {formData.industry_interests}</div>
+                      <div className="break-words"><span className="text-muted-foreground">Interests:</span> {formData.industry_interests}</div>
                     )}
                   </div>
                 </div>
@@ -636,7 +636,7 @@ export function ProfileForm() {
   }
 
   return (
-    <section id="join-form" className="py-20 px-4">
+    <section id="join-form" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -645,23 +645,23 @@ export function ProfileForm() {
           viewport={{ once: true }}
         >
           <Card className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border border-accent/20 shadow-2xl hover:shadow-accent/20 hover:border-accent/40 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Join the Base
               </CardTitle>
               
               {/* Step Indicator */}
-              <div className="flex justify-center mt-8">
-                <div className="flex items-center space-x-4">
+              <div className="flex justify-center mt-6 sm:mt-8 px-2">
+                <div className="flex items-center space-x-2 sm:space-x-4 overflow-x-auto pb-2">
                   {steps.map((step, index) => {
                     const Icon = step.icon
                     const isActive = currentStep === step.number
                     const isCompleted = currentStep > step.number
                     
                     return (
-                      <div key={step.number} className="flex items-center">
+                      <div key={step.number} className="flex items-center flex-shrink-0">
                         <motion.div
-                          className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-300 ${
+                          className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-300 ${
                             isCompleted
                               ? 'bg-accent border-accent text-black'
                               : isActive
@@ -671,41 +671,48 @@ export function ProfileForm() {
                           whileHover={{ scale: 1.05 }}
                         >
                           {isCompleted ? (
-                            <Check className="w-5 h-5" />
+                            <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                           ) : (
-                            <Icon className="w-5 h-5" />
+                            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                           )}
                         </motion.div>
                         
-                        <div className="ml-3 hidden sm:block">
-                          <div className={`text-sm font-medium ${isActive ? 'text-accent' : 'text-muted-foreground'}`}>
+                        <div className="ml-2 sm:ml-3 hidden md:block">
+                          <div className={`text-xs sm:text-sm font-medium ${isActive ? 'text-accent' : 'text-muted-foreground'}`}>
                             {step.title}
                           </div>
                         </div>
                         
                         {index < steps.length - 1 && (
-                          <div className={`w-8 h-0.5 mx-4 ${isCompleted ? 'bg-accent' : 'bg-muted-foreground/30'}`} />
+                          <div className={`w-4 sm:w-8 h-0.5 mx-2 sm:mx-4 ${isCompleted ? 'bg-accent' : 'bg-muted-foreground/30'}`} />
                         )}
                       </div>
                     )
                   })}
                 </div>
               </div>
+              
+              {/* Mobile Step Title */}
+              <div className="block md:hidden text-center mt-4">
+                <div className="text-sm font-medium text-accent">
+                  Step {currentStep}: {steps[currentStep - 1]?.title}
+                </div>
+              </div>
             </CardHeader>
             
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               <AnimatePresence mode="wait">
                 {renderStepContent()}
               </AnimatePresence>
               
               {/* Navigation Buttons */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-border/50">
+              <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border/50">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={prevStep}
                   disabled={currentStep === 1}
-                  className="flex items-center space-x-2 hover:border-accent hover:text-accent transition-all duration-200"
+                  className="flex items-center justify-center space-x-2 hover:border-accent hover:text-accent transition-all duration-200 w-full sm:w-auto order-2 sm:order-1"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span>Previous</span>
@@ -716,7 +723,7 @@ export function ProfileForm() {
                     type="button"
                     onClick={nextStep}
                     disabled={!validateStep(currentStep)}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
+                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
                   >
                     <span>Next</span>
                     <ChevronRight className="w-4 h-4" />
@@ -726,7 +733,7 @@ export function ProfileForm() {
                     type="button"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex items-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
+                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
                   >
                     {isSubmitting ? (
                       <>
