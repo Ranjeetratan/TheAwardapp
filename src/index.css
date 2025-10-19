@@ -48,4 +48,10 @@
     ring-color: hsl(var(--accent) / 0.2);
     ring-width: 2px;
   }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

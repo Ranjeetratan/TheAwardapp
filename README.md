@@ -9,13 +9,19 @@ CofounderBase solves the problem of finding the right cofounder by providing a c
 ## ✨ Features
 
 - **🎨 Beautiful Dark UI** - Modern gradient design with accent color (#f1fb48)
-- **📋 4-Step Form Wizard** - Intuitive step-by-step profile creation
-- **👥 Role-Based Profiles** - Separate flows for Founders and Cofounders
-- **📸 Headshot Upload** - Profile images with Supabase Storage
-- **⚡ Real-time Validation** - Smart form validation at each step
-- **📱 Fully Responsive** - Perfect on desktop, tablet, and mobile
-- **🎭 Smooth Animations** - Framer Motion powered transitions
-- **🔒 Secure Backend** - Supabase integration with RLS policies
+- **🔄 Animated Hero Section** - Rotating text for Technical Cofounders/CTO Candidates/Angel Investors
+- **🎯 Modern Logo Design** - Meaningful networking-inspired logo with "cofounderBase" typography
+- **🔍 Hero Search Bar** - Integrated search with popular tech stack suggestions
+- **📱 Fully Responsive** - Perfect on desktop, tablet, and mobile devices
+- **🎛️ Collapsible Advanced Filters** - Hidden by default, expandable with comprehensive filtering options
+- **👥 Multi-Role Support** - Separate flows for Founders, Cofounders, and Investors
+- **🌟 Enhanced Coming Soon Section** - Prioritized roadmap with status indicators
+- **🔒 SEO Optimized** - Comprehensive meta tags targeting cofounder/founder/investor keywords
+- **🎭 Smooth Animations** - Framer Motion powered transitions throughout
+- **💎 Glassy Header** - Transparent backdrop-blur header design
+- **🛠️ Admin Dashboard** - Basic admin panel for profile management and analytics
+- **💬 Support Integration** - Direct LinkedIn contact for support queries
+- **🎯 Keyword Optimization** - Optimized for "find cofounder", "technical cofounder", "CTO candidates" searches
 
 ## 🚀 Quick Start
 
@@ -41,13 +47,19 @@ CofounderBase solves the problem of finding the right cofounder by providing a c
      ```
 
 3. **Initialize Database**
-   - Run the SQL from `supabase-setup.sql` in your Supabase SQL editor
-   - This creates the profiles table and headshots storage bucket
+   - **New Setup**: Run the SQL from `supabase-setup.sql` in your Supabase SQL editor
+   - **Existing Database**: Use `supabase-migration.sql` to upgrade your existing database
+   - See `SUPABASE_SETUP.md` for detailed instructions
+   - This creates profiles table, advertisements table, and storage buckets
 
 4. **Start Development**
    ```bash
    npm run dev
    ```
+
+5. **Access Admin Panel**
+   - Add `?admin=true` to your URL to access the admin dashboard
+   - Example: `http://localhost:5173/?admin=true`
 
 ## 🏗️ Tech Stack
 

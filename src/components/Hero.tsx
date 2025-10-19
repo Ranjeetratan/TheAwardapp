@@ -1,8 +1,27 @@
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { SearchBar } from './SearchBar'
 
-export function Hero() {
+interface HeroProps {
+  searchQuery: string
+  onSearchChange: (value: string) => void
+  activeTab: 'founders' | 'cofounders' | 'investors'
+}
+
+export function Hero({ searchQuery, onSearchChange, activeTab }: HeroProps) {
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+  const roles = ['Founders', 'Cofounders', 'Investors']
+  
+  // Animate role text every 3 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentRoleIndex((prev) => (prev + 1) % roles.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center relative bg-gradient-to-br from-transparent via-accent/5 to-transparent">
+    <section className="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center relative">
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -11,37 +30,63 @@ export function Hero() {
         className="max-w-4xl mx-auto w-full"
       >
         
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent leading-tight"
+          className="mb-12"
         >
-          CofounderBase
-        </motion.h1>
-        
-        <motion.p
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight">
+            <div className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-6">
+              Find your perfect
+            </div>
+            <div className="h-20 sm:h-24 md:h-28 lg:h-32 flex items-center justify-center overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentRoleIndex}
+                  initial={{ opacity: 0, y: 30, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -30, scale: 0.8 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  className="bg-gradient-to-r from-accent via-accent/90 to-accent/80 bg-clip-text text-transparent text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-none"
+                >
+                  {roles[currentRoleIndex]}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </h1>
+        </motion.div>
+
+        {/* Hero Search Bar - Will become sticky */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg sm:text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 px-2"
+          className="mb-12"
+          id="hero-search"
         >
-          Find your cofounder or join a startup — simple, fast, and founder-focused.
-        </motion.p>
+          <div className="sticky top-20 z-40 bg-background/80 backdrop-blur-xl rounded-2xl border border-accent/20 p-4">
+            <SearchBar
+              value={searchQuery}
+              onChange={onSearchChange}
+              placeholder={`Search ${activeTab}...`}
+            />
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex justify-center px-4"
+          className="flex justify-center"
         >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => document.getElementById('join-form')?.scrollIntoView({ behavior: 'smooth' })}
-            className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-sm sm:text-base"
+            onClick={() => document.getElementById('directory')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
           >
-            Get Started
+            Start Connecting
           </motion.button>
         </motion.div>
       </motion.div>

@@ -21,7 +21,7 @@ export type Profile = {
   availability: string
   timezone?: string
   looking_for: string
-  role: 'founder' | 'cofounder'
+  role: 'founder' | 'cofounder' | 'investor'
   
   // Founder-specific fields
   startup_name?: string
@@ -37,6 +37,26 @@ export type Profile = {
   past_projects?: string
   why_join_startup?: string
   
+  // Investor-specific fields
+  investment_range?: string
+  investment_stage?: string
+  investment_focus?: string
+  portfolio_companies?: string
+  investment_criteria?: string
+  
   approved: boolean
+  featured: boolean
   created_at?: string
+}
+
+export type Advertisement = {
+  id: string
+  title: string
+  description: string
+  image_url?: string
+  cta_text: string
+  cta_url: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }

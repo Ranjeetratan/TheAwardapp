@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight, Check, User, Briefcase, FileText, Eye } from
 
 export function ProfileForm() {
   const [currentStep, setCurrentStep] = useState(1)
-  const [role, setRole] = useState<'founder' | 'cofounder' | null>(null)
+  const [role, setRole] = useState<'founder' | 'cofounder' | 'investor' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [headshot, setHeadshot] = useState<File | null>(null)
@@ -37,7 +37,14 @@ export function ProfileForm() {
     experience_level: '',
     industry_interests: '',
     past_projects: '',
-    why_join_startup: ''
+    why_join_startup: '',
+    
+    // Investor fields
+    investment_range: '',
+    investment_stage: '',
+    investment_focus: '',
+    portfolio_companies: '',
+    investment_criteria: ''
   })
 
   const steps = [
@@ -72,6 +79,9 @@ export function ProfileForm() {
                    formData.what_building && formData.looking_for_cofounder)
         } else if (role === 'cofounder') {
           return !!(formData.skills_expertise && formData.experience_level && formData.why_join_startup)
+        } else if (role === 'investor') {
+          return !!(formData.investment_range && formData.investment_stage && formData.investment_focus && 
+                   formData.investment_criteria)
         }
         return false
       default:
@@ -141,6 +151,7 @@ export function ProfileForm() {
         looking_for: formData.looking_for,
         role,
         approved: false,
+        featured: false,
         ...(role === 'founder' && {
           startup_name: formData.startup_name,
           startup_stage: formData.startup_stage,
@@ -154,6 +165,13 @@ export function ProfileForm() {
           industry_interests: formData.industry_interests || undefined,
           past_projects: formData.past_projects || undefined,
           why_join_startup: formData.why_join_startup
+        }),
+        ...(role === 'investor' && {
+          investment_range: formData.investment_range,
+          investment_stage: formData.investment_stage,
+          investment_focus: formData.investment_focus,
+          portfolio_companies: formData.portfolio_companies || undefined,
+          investment_criteria: formData.investment_criteria
         })
       }
 
@@ -367,7 +385,7 @@ export function ProfileForm() {
               <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">Choose your role to customize your profile</p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -405,6 +423,28 @@ export function ProfileForm() {
                   <User className="w-6 h-6 sm:w-8 sm:h-8" />
                   <span className="font-semibold">Cofounder</span>
                   <span className="text-xs sm:text-sm opacity-80 text-center px-2">I want to join a startup</span>
+                </Button>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  type="button"
+                  variant={role === 'investor' ? 'default' : 'outline'}
+                  className={`w-full h-28 sm:h-32 flex flex-col items-center justify-center space-y-2 sm:space-y-3 text-base sm:text-lg transition-all duration-200 ${
+                    role === 'investor' 
+                      ? 'bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 shadow-lg shadow-accent/25' 
+                      : 'hover:border-accent hover:bg-accent/5 hover:text-white'
+                  }`}
+                  onClick={() => setRole('investor')}
+                >
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="font-semibold">Investor</span>
+                  <span className="text-xs sm:text-sm opacity-80 text-center px-2">I want to invest in startups</span>
                 </Button>
               </motion.div>
             </div>
@@ -548,6 +588,72 @@ export function ProfileForm() {
                 </div>
               </>
             )}
+
+            {role === 'investor' && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="investment_range">Investment Range *</Label>
+                  <Input
+                    id="investment_range"
+                    value={formData.investment_range}
+                    onChange={(e) => handleInputChange('investment_range', e.target.value)}
+                    placeholder="e.g., $10K - $100K, $100K - $1M"
+                    className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="investment_stage">Investment Stage *</Label>
+                    <select
+                      id="investment_stage"
+                      value={formData.investment_stage}
+                      onChange={(e) => handleInputChange('investment_stage', e.target.value)}
+                      className="flex h-10 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus:border-accent transition-all duration-200"
+                    >
+                      <option value="">Select stage</option>
+                      <option value="Pre-Seed">Pre-Seed</option>
+                      <option value="Seed">Seed</option>
+                      <option value="Series A">Series A</option>
+                      <option value="Series B+">Series B+</option>
+                      <option value="All Stages">All Stages</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="investment_focus">Investment Focus *</Label>
+                    <Input
+                      id="investment_focus"
+                      value={formData.investment_focus}
+                      onChange={(e) => handleInputChange('investment_focus', e.target.value)}
+                      placeholder="FinTech, HealthTech, AI/ML, etc."
+                      className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="portfolio_companies">Portfolio Companies</Label>
+                  <Textarea
+                    id="portfolio_companies"
+                    value={formData.portfolio_companies}
+                    onChange={(e) => handleInputChange('portfolio_companies', e.target.value)}
+                    placeholder="List some of your portfolio companies or investment experience..."
+                    className="min-h-[100px] transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="investment_criteria">Investment Criteria *</Label>
+                  <Textarea
+                    id="investment_criteria"
+                    value={formData.investment_criteria}
+                    onChange={(e) => handleInputChange('investment_criteria', e.target.value)}
+                    placeholder="What do you look for in startups? Team, market size, traction, etc..."
+                    className="min-h-[100px] transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+              </>
+            )}
           </motion.div>
         )
 
@@ -623,6 +729,17 @@ export function ProfileForm() {
                     {formData.industry_interests && (
                       <div className="break-words"><span className="text-muted-foreground">Interests:</span> {formData.industry_interests}</div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {role === 'investor' && (
+                <div className="bg-card/30 rounded-2xl p-4 sm:p-6 border border-border/50">
+                  <h4 className="font-semibold text-accent mb-3 sm:mb-4 text-sm sm:text-base">Investment Profile</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
+                    <div className="break-words"><span className="text-muted-foreground">Range:</span> {formData.investment_range}</div>
+                    <div className="break-words"><span className="text-muted-foreground">Stage:</span> {formData.investment_stage}</div>
+                    <div className="break-words"><span className="text-muted-foreground">Focus:</span> {formData.investment_focus}</div>
                   </div>
                 </div>
               )}

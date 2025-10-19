@@ -6,7 +6,7 @@ export function Logo() {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center space-x-2"
+      className="flex items-center space-x-3"
     >
       <div className="relative">
         <div className="w-8 h-8 flex items-center justify-center">
@@ -17,23 +17,25 @@ export function Logo() {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <path
-              d="M8 16C8 12.6863 10.6863 10 14 10C17.3137 10 20 12.6863 20 16"
-              stroke="#f1fb48"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <path
-              d="M24 16C24 19.3137 21.3137 22 18 22C14.6863 22 12 19.3137 12 16"
-              stroke="#f1fb48"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <circle cx="14" cy="16" r="2" fill="#f1fb48" />
-            <circle cx="18" cy="16" r="2" fill="#f1fb48" />
+            <defs>
+              <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#f1fb48"/>
+                <stop offset="100%" stopColor="#e6f030"/>
+              </linearGradient>
+            </defs>
+            <circle cx="10" cy="12" r="3" fill="url(#logoGradient)" opacity="0.9"/>
+            <circle cx="22" cy="12" r="3" fill="url(#logoGradient)" opacity="0.9"/>
+            <circle cx="16" cy="22" r="3" fill="url(#logoGradient)" opacity="0.9"/>
+            <path d="M13 12L19 12" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M12 14L14.5 20" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M20 14L17.5 20" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="16" cy="16" r="1.5" fill="url(#logoGradient)"/>
           </svg>
         </div>
       </div>
+      <span className="text-xl font-light tracking-wide text-white">
+        cofounder<span className="font-bold">Base</span>
+      </span>
     </motion.div>
   )
 }
