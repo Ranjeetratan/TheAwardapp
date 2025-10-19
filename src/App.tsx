@@ -15,7 +15,8 @@ function App() {
   // Check URL for admin route
   useEffect(() => {
     const path = window.location.pathname
-    if (path === '/admin') {
+    const hash = window.location.hash
+    if (path === '/admin' || hash === '#admin') {
       const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
       if (isAuthenticated) {
         setIsAdminAuthenticated(true)
@@ -25,12 +26,30 @@ function App() {
     }
   }, [])
 
+  // Listen for hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      if (hash === '#admin') {
+        const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
+        if (isAuthenticated) {
+          setIsAdminAuthenticated(true)
+        } else {
+          setShowAdminLogin(true)
+        }
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
   const handleAdminLogin = (password: string) => {
     if (password === 'De@dp00l') {
       setIsAdminAuthenticated(true)
       setShowAdminLogin(false)
       localStorage.setItem('adminAuthenticated', 'true')
-      window.history.pushState({}, '', '/admin')
+      window.location.hash = 'admin'
     } else {
       alert('Invalid password')
     }
@@ -39,7 +58,7 @@ function App() {
   const handleAdminLogout = () => {
     setIsAdminAuthenticated(false)
     localStorage.removeItem('adminAuthenticated')
-    window.history.pushState({}, '', '/')
+    window.location.hash = ''
   }
 
   const handleBackFromProfile = () => {

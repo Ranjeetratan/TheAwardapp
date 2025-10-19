@@ -150,7 +150,7 @@ export function ProfileForm() {
         timezone: formData.timezone || undefined,
         looking_for: formData.looking_for,
         role,
-        approved: false,
+        approved: true,
         featured: false,
         ...(role === 'founder' && {
           startup_name: formData.startup_name,
