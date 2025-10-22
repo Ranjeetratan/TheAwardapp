@@ -8,7 +8,11 @@ import { Label } from './ui/label'
 import { supabase, type Profile } from '../lib/supabase'
 import { ChevronLeft, ChevronRight, Check, User, Briefcase, FileText, Eye } from 'lucide-react'
 
-export function ProfileForm() {
+interface ProfileFormProps {
+  onSuccess?: () => void
+}
+
+export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
   const [currentStep, setCurrentStep] = useState(1)
   const [role, setRole] = useState<'founder' | 'cofounder' | 'investor' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -221,10 +225,22 @@ export function ProfileForm() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="text-muted-foreground text-base sm:text-lg"
+                  className="text-muted-foreground text-base sm:text-lg mb-6"
                 >
-                  We'll review your profile and make it live soon.
+                  Your profile is now live and visible in the directory!
                 </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  <Button
+                    onClick={onSuccess}
+                    className="bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
+                  >
+                    View Directory
+                  </Button>
+                </motion.div>
               </CardContent>
             </Card>
           </motion.div>

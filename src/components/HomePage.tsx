@@ -45,6 +45,16 @@ export function HomePage() {
     fetchProfiles()
   }, [])
 
+  // Refresh profiles when returning to homepage
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchProfiles()
+    }
+    
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [])
+
   // Animate role text every 3 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -225,6 +235,8 @@ export function HomePage() {
 
   const handleCloseForm = () => {
     setShowForm(false)
+    // Refresh profiles when returning from form to show any new submissions
+    fetchProfiles()
   }
 
   const handleProfileClick = (profile: Profile) => {
@@ -268,7 +280,7 @@ export function HomePage() {
           >
             ← Back to Directory
           </button>
-          <ProfileForm />
+          <ProfileForm onSuccess={handleCloseForm} />
         </div>
       </div>
     )
