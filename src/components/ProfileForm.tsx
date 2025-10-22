@@ -635,13 +635,21 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
               <>
                 <div className="space-y-2">
                   <Label htmlFor="investment_range">Investment Range *</Label>
-                  <Input
+                  <select
                     id="investment_range"
                     value={formData.investment_range}
                     onChange={(e) => handleInputChange('investment_range', e.target.value)}
-                    placeholder="e.g., $10K - $100K, $100K - $1M"
-                    className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
-                  />
+                    className="flex h-10 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus:border-accent transition-all duration-200"
+                  >
+                    <option value="">Select investment range</option>
+                    <option value="$1K-$10K">$1K-$10K</option>
+                    <option value="$10K-$50K">$10K-$50K</option>
+                    <option value="$50K-$100K">$50K-$100K</option>
+                    <option value="$100K-$500K">$100K-$500K</option>
+                    <option value="$500K-$1M">$500K-$1M</option>
+                    <option value="$1M-$5M">$1M-$5M</option>
+                    <option value="$5M+">$5M+</option>
+                  </select>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -654,11 +662,14 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
                       className="flex h-10 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm ring-offset-background hover:border-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus:border-accent transition-all duration-200"
                     >
                       <option value="">Select stage</option>
-                      <option value="Pre-Seed">Pre-Seed</option>
+                      <option value="Angel">Angel</option>
                       <option value="Seed">Seed</option>
                       <option value="Series A">Series A</option>
                       <option value="Series B+">Series B+</option>
-                      <option value="All Stages">All Stages</option>
+                      <option value="Strategic">Strategic</option>
+                      <option value="Venture Debt">Venture Debt</option>
+                      <option value="Syndicate">Syndicate</option>
+                      <option value="Family Office">Family Office</option>
                     </select>
                   </div>
                   <div className="space-y-2">
