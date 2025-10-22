@@ -74,7 +74,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
       case 1:
         return !!(formData.full_name && formData.email && formData.location && 
                  formData.linkedin_profile && formData.short_bio && formData.availability && 
-                 formData.looking_for && headshot)
+                 formData.looking_for)
       case 2:
         return !!role
       case 3:
@@ -135,10 +135,16 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
     try {
       let headshotUrl = null
       
+      // Try to upload headshot if provided
       if (headshot) {
-        headshotUrl = await uploadHeadshot(headshot)
-        if (!headshotUrl) {
-          throw new Error('Failed to upload headshot')
+        try {
+          headshotUrl = await uploadHeadshot(headshot)
+          if (!headshotUrl) {
+            console.warn('Headshot upload failed, continuing without headshot')
+          }
+        } catch (uploadError) {
+          console.warn('Headshot upload error, continuing without headshot:', uploadError)
+          // Continue without headshot rather than failing the entire submission
         }
       }
 
@@ -179,16 +185,24 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
         })
       }
 
-      const { error } = await supabase
+      console.log('Submitting profile data:', profileData)
+
+      const { data, error } = await supabase
         .from('profiles')
         .insert([profileData])
+        .select()
 
-      if (error) throw error
+      if (error) {
+        console.error('Database error:', error)
+        throw new Error(`Database error: ${error.message}`)
+      }
 
+      console.log('Profile submitted successfully:', data[0])
       setIsSubmitted(true)
     } catch (error) {
       console.error('Error submitting profile:', error)
-      alert('There was an error submitting your profile. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`There was an error submitting your profile: ${errorMessage}. Please try again.`)
     } finally {
       setIsSubmitting(false)
     }
@@ -284,7 +298,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="headshot">Headshot *</Label>
+              <Label htmlFor="headshot">Headshot (Optional)</Label>
               <div className="relative">
                 <div className="h-24 border border-input rounded-2xl bg-background hover:border-accent/50 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-all duration-200 flex items-center justify-center">
                   <input
