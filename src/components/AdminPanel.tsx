@@ -25,7 +25,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     investorsCount: 0
   })
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'profiles' | 'ads'>('profiles')
+  const [activeTab, setActiveTab] = useState<'founders' | 'cofounders' | 'investors' | 'ads'>('founders')
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null)
   const [newAd, setNewAd] = useState({
     title: '',
@@ -333,30 +333,62 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleUpdateProfile = async (profile: Profile) => {
     try {
+      const updateData: any = {
+        // Basic fields
+        full_name: profile.full_name,
+        email: profile.email,
+        location: profile.location,
+        linkedin_profile: profile.linkedin_profile,
+        website_portfolio: profile.website_portfolio,
+        headshot_url: profile.headshot_url,
+        short_bio: profile.short_bio,
+        availability: profile.availability,
+        timezone: profile.timezone,
+        looking_for: profile.looking_for,
+        updated_at: new Date().toISOString()
+      }
+
+      // Role-specific fields
+      if (profile.role === 'founder') {
+        updateData.startup_name = profile.startup_name
+        updateData.startup_stage = profile.startup_stage
+        updateData.industry = profile.industry
+        updateData.what_building = profile.what_building
+        updateData.looking_for_cofounder = profile.looking_for_cofounder
+        updateData.company_size = profile.company_size
+        updateData.funding_stage = profile.funding_stage
+      } else if (profile.role === 'cofounder') {
+        updateData.skills_expertise = profile.skills_expertise
+        updateData.experience_level = profile.experience_level
+        updateData.industry_interests = profile.industry_interests
+        updateData.past_projects = profile.past_projects
+        updateData.why_join_startup = profile.why_join_startup
+      } else if (profile.role === 'investor') {
+        updateData.investment_range = profile.investment_range
+        updateData.investment_stage = profile.investment_stage
+        updateData.investment_focus = profile.investment_focus
+        updateData.portfolio_companies = profile.portfolio_companies
+        updateData.investment_criteria = profile.investment_criteria
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          full_name: profile.full_name,
-          location: profile.location,
-          short_bio: profile.short_bio,
-          linkedin_profile: profile.linkedin_profile,
-          headshot_url: profile.headshot_url,
-          startup_name: profile.startup_name,
-          industry: profile.industry,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', profile.id)
 
       if (error) {
         console.error('Error updating profile:', error)
+        alert('Error updating profile. Please try again.')
       } else {
         setProfiles(prev => prev.map(p => 
           p.id === profile.id ? profile : p
         ))
         setEditingProfile(null)
+        alert('Profile updated successfully!')
       }
     } catch (error) {
       console.error('Error:', error)
+      alert('Error updating profile. Please try again.')
     }
   }
 
@@ -396,28 +428,52 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-8 bg-card/30 p-1 rounded-xl border border-accent/20">
+        <div className="flex space-x-1 mb-8 bg-card/30 p-1 rounded-xl border border-accent/20 overflow-x-auto">
           <button
-            onClick={() => setActiveTab('profiles')}
-            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'profiles'
+            onClick={() => setActiveTab('founders')}
+            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+              activeTab === 'founders'
+                ? 'bg-accent text-black shadow-lg'
+                : 'text-muted-foreground hover:text-white hover:bg-card/50'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 inline mr-2" />
+            Founders ({stats.foundersCount})
+          </button>
+          <button
+            onClick={() => setActiveTab('cofounders')}
+            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+              activeTab === 'cofounders'
                 ? 'bg-accent text-black shadow-lg'
                 : 'text-muted-foreground hover:text-white hover:bg-card/50'
             }`}
           >
             <Users className="w-4 h-4 inline mr-2" />
-            Profile Management
+            Co-founders ({stats.cofoundersCount})
+          </button>
+          <button
+            onClick={() => setActiveTab('investors')}
+            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+              activeTab === 'investors'
+                ? 'bg-accent text-black shadow-lg'
+                : 'text-muted-foreground hover:text-white hover:bg-card/50'
+            }`}
+          >
+            <svg className="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Investors ({stats.investorsCount})
           </button>
           <button
             onClick={() => setActiveTab('ads')}
-            className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
+            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
               activeTab === 'ads'
                 ? 'bg-accent text-black shadow-lg'
                 : 'text-muted-foreground hover:text-white hover:bg-card/50'
             }`}
           >
             <Megaphone className="w-4 h-4 inline mr-2" />
-            Advertisement Management
+            Advertisements
           </button>
         </div>
 
@@ -482,15 +538,28 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         </div>
 
         {/* Content based on active tab */}
-        {activeTab === 'profiles' && (
+        {(activeTab === 'founders' || activeTab === 'cofounders' || activeTab === 'investors') && (
           <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
             <CardHeader>
-              <CardTitle className="text-xl">Profile Management</CardTitle>
-              <p className="text-muted-foreground">Review and manage user profiles</p>
+              <CardTitle className="text-xl">
+                {activeTab === 'founders' && 'Founder Management'}
+                {activeTab === 'cofounders' && 'Co-founder Management'}
+                {activeTab === 'investors' && 'Investor Management'}
+              </CardTitle>
+              <p className="text-muted-foreground">
+                {activeTab === 'founders' && 'Review and manage founder profiles'}
+                {activeTab === 'cofounders' && 'Review and manage co-founder profiles'}
+                {activeTab === 'investors' && 'Review and manage investor profiles'}
+              </p>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {profiles.map((profile) => (
+                {profiles.filter(profile => {
+                  if (activeTab === 'founders') return profile.role === 'founder'
+                  if (activeTab === 'cofounders') return profile.role === 'cofounder'
+                  if (activeTab === 'investors') return profile.role === 'investor'
+                  return false
+                }).map((profile) => (
                   <motion.div
                     key={profile.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -587,84 +656,315 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
           </Card>
         )}
 
-        {/* Profile Edit Modal */}
+        {/* Enhanced Profile Edit Modal */}
         {editingProfile && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-            <Card className="w-full max-w-2xl bg-card/95 backdrop-blur-xl border-accent/20 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <Card className="w-full max-w-4xl bg-card/95 backdrop-blur-xl border-accent/20 shadow-2xl max-h-[90vh] overflow-y-auto">
               <CardHeader>
-                <CardTitle className="text-xl text-white">Edit Profile: {editingProfile.full_name}</CardTitle>
+                <CardTitle className="text-xl text-white">Edit Profile: {editingProfile.full_name} ({editingProfile.role})</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-2">Full Name</label>
-                    <Input
-                      value={editingProfile.full_name}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, full_name: e.target.value } : null)}
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-2">Location</label>
-                    <Input
-                      value={editingProfile.location}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, location: e.target.value } : null)}
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-                </div>
-                
+              <CardContent className="space-y-6">
+                {/* Basic Information */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">LinkedIn Profile</label>
-                  <Input
-                    value={editingProfile.linkedin_profile}
-                    onChange={(e) => setEditingProfile(prev => prev ? { ...prev, linkedin_profile: e.target.value } : null)}
-                    className="bg-background/50 border-accent/20"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Headshot URL</label>
-                  <Input
-                    value={editingProfile.headshot_url || ''}
-                    onChange={(e) => setEditingProfile(prev => prev ? { ...prev, headshot_url: e.target.value } : null)}
-                    placeholder="https://example.com/image.jpg"
-                    className="bg-background/50 border-accent/20"
-                  />
-                </div>
-
-                {editingProfile.role === 'founder' && (
+                  <h3 className="text-lg font-semibold text-accent mb-4">Basic Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">Startup Name</label>
+                      <label className="block text-sm font-medium text-white mb-2">Full Name *</label>
                       <Input
-                        value={editingProfile.startup_name || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, startup_name: e.target.value } : null)}
+                        value={editingProfile.full_name}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, full_name: e.target.value } : null)}
                         className="bg-background/50 border-accent/20"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">Industry</label>
+                      <label className="block text-sm font-medium text-white mb-2">Email *</label>
                       <Input
-                        value={editingProfile.industry || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, industry: e.target.value } : null)}
+                        value={editingProfile.email}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, email: e.target.value } : null)}
                         className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Location *</label>
+                      <Input
+                        value={editingProfile.location}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, location: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Availability *</label>
+                      <select
+                        value={editingProfile.availability}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, availability: e.target.value } : null)}
+                        className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                      >
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Open to Discuss">Open to Discuss</option>
+                        <option value="Consulting">Consulting</option>
+                        <option value="Equity Only">Equity Only</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Timezone</label>
+                      <Input
+                        value={editingProfile.timezone || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, timezone: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-white mb-2">Looking For *</label>
+                      <Input
+                        value={editingProfile.looking_for}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, looking_for: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-white mb-2">LinkedIn Profile *</label>
+                    <Input
+                      value={editingProfile.linkedin_profile}
+                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, linkedin_profile: e.target.value } : null)}
+                      className="bg-background/50 border-accent/20"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-white mb-2">Website/Portfolio</label>
+                    <Input
+                      value={editingProfile.website_portfolio || ''}
+                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, website_portfolio: e.target.value } : null)}
+                      className="bg-background/50 border-accent/20"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-white mb-2">Headshot URL</label>
+                    <Input
+                      value={editingProfile.headshot_url || ''}
+                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, headshot_url: e.target.value } : null)}
+                      placeholder="https://example.com/image.jpg"
+                      className="bg-background/50 border-accent/20"
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-white mb-2">Bio *</label>
+                    <Textarea
+                      value={editingProfile.short_bio}
+                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, short_bio: e.target.value } : null)}
+                      className="bg-background/50 border-accent/20"
+                      rows={4}
+                    />
+                  </div>
+                </div>
+
+                {/* Founder-specific fields */}
+                {editingProfile.role === 'founder' && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-accent mb-4">Startup Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Startup Name</label>
+                        <Input
+                          value={editingProfile.startup_name || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, startup_name: e.target.value } : null)}
+                          className="bg-background/50 border-accent/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Startup Stage</label>
+                        <select
+                          value={editingProfile.startup_stage || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, startup_stage: e.target.value } : null)}
+                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                        >
+                          <option value="">Select stage</option>
+                          <option value="Idea">Idea</option>
+                          <option value="MVP">MVP</option>
+                          <option value="Pre-Seed">Pre-Seed</option>
+                          <option value="Seed">Seed</option>
+                          <option value="Series A">Series A</option>
+                          <option value="Series B+">Series B+</option>
+                          <option value="Scaling">Scaling</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Industry</label>
+                        <Input
+                          value={editingProfile.industry || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, industry: e.target.value } : null)}
+                          className="bg-background/50 border-accent/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Company Size</label>
+                        <select
+                          value={editingProfile.company_size || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, company_size: e.target.value } : null)}
+                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                        >
+                          <option value="">Select size</option>
+                          <option value="Solo Founder">Solo Founder</option>
+                          <option value="2-3 People">2-3 People</option>
+                          <option value="4-10 People">4-10 People</option>
+                          <option value="11-50 People">11-50 People</option>
+                          <option value="50+ People">50+ People</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">What You're Building</label>
+                      <Textarea
+                        value={editingProfile.what_building || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, what_building: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Looking for Co-founder</label>
+                      <Textarea
+                        value={editingProfile.looking_for_cofounder || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, looking_for_cofounder: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
                       />
                     </div>
                   </div>
                 )}
 
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">Bio</label>
-                  <Textarea
-                    value={editingProfile.short_bio}
-                    onChange={(e) => setEditingProfile(prev => prev ? { ...prev, short_bio: e.target.value } : null)}
-                    className="bg-background/50 border-accent/20"
-                    rows={4}
-                  />
-                </div>
+                {/* Co-founder-specific fields */}
+                {editingProfile.role === 'cofounder' && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-accent mb-4">Skills & Experience</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Skills/Expertise</label>
+                        <Input
+                          value={editingProfile.skills_expertise || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, skills_expertise: e.target.value } : null)}
+                          className="bg-background/50 border-accent/20"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Experience Level</label>
+                        <select
+                          value={editingProfile.experience_level || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, experience_level: e.target.value } : null)}
+                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                        >
+                          <option value="">Select level</option>
+                          <option value="Beginner (0-2 years)">Beginner (0-2 years)</option>
+                          <option value="Intermediate (3-5 years)">Intermediate (3-5 years)</option>
+                          <option value="Senior (6-10 years)">Senior (6-10 years)</option>
+                          <option value="Expert (10+ years)">Expert (10+ years)</option>
+                          <option value="Serial Entrepreneur">Serial Entrepreneur</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Industry Interests</label>
+                      <Input
+                        value={editingProfile.industry_interests || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, industry_interests: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Past Projects</label>
+                      <Textarea
+                        value={editingProfile.past_projects || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, past_projects: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Why Join a Startup</label>
+                      <Textarea
+                        value={editingProfile.why_join_startup || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, why_join_startup: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                )}
 
-                <div className="flex space-x-3 pt-4">
+                {/* Investor-specific fields */}
+                {editingProfile.role === 'investor' && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-accent mb-4">Investment Profile</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Investment Range</label>
+                        <select
+                          value={editingProfile.investment_range || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_range: e.target.value } : null)}
+                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                        >
+                          <option value="">Select range</option>
+                          <option value="$1K-$10K">$1K-$10K</option>
+                          <option value="$10K-$50K">$10K-$50K</option>
+                          <option value="$50K-$100K">$50K-$100K</option>
+                          <option value="$100K-$500K">$100K-$500K</option>
+                          <option value="$500K-$1M">$500K-$1M</option>
+                          <option value="$1M-$5M">$1M-$5M</option>
+                          <option value="$5M+">$5M+</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-white mb-2">Investment Stage</label>
+                        <select
+                          value={editingProfile.investment_stage || ''}
+                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_stage: e.target.value } : null)}
+                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
+                        >
+                          <option value="">Select stage</option>
+                          <option value="Angel">Angel</option>
+                          <option value="Seed">Seed</option>
+                          <option value="Series A">Series A</option>
+                          <option value="Series B+">Series B+</option>
+                          <option value="Strategic">Strategic</option>
+                          <option value="Venture Debt">Venture Debt</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Investment Focus</label>
+                      <Input
+                        value={editingProfile.investment_focus || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_focus: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Portfolio Companies</label>
+                      <Textarea
+                        value={editingProfile.portfolio_companies || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, portfolio_companies: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
+                      />
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-white mb-2">Investment Criteria</label>
+                      <Textarea
+                        value={editingProfile.investment_criteria || ''}
+                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_criteria: e.target.value } : null)}
+                        className="bg-background/50 border-accent/20"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex space-x-3 pt-6 border-t border-accent/20">
                   <Button
                     onClick={() => handleUpdateProfile(editingProfile)}
                     className="bg-green-600 hover:bg-green-700"
