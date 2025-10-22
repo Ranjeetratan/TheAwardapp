@@ -100,7 +100,7 @@ export function HomePage() {
     )
   }
 
-  // Process profiles to ensure proper casing
+  // Process profiles to ensure proper casing and sort by role priority
   const processedProfiles = profiles.map(profile => ({
     ...profile,
     full_name: toTitleCase(profile.full_name),
@@ -108,7 +108,21 @@ export function HomePage() {
     location: toTitleCase(profile.location),
     industry: profile.industry ? toTitleCase(profile.industry) : profile.industry,
     role: profile.role.toLowerCase() as 'founder' | 'cofounder' | 'investor'
-  }))
+  })).sort((a, b) => {
+    // Define role priority: founders first, then cofounders, then investors
+    const rolePriority = { founder: 1, cofounder: 2, investor: 3 }
+    
+    // First sort by role priority
+    const roleComparison = rolePriority[a.role] - rolePriority[b.role]
+    if (roleComparison !== 0) return roleComparison
+    
+    // Within same role, prioritize featured profiles
+    if (a.featured && !b.featured) return -1
+    if (!a.featured && b.featured) return 1
+    
+    // Finally sort by creation date (newest first)
+    return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
+  })
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => {
