@@ -286,13 +286,25 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
             <div className="space-y-2">
               <Label htmlFor="headshot">Headshot *</Label>
               <div className="relative">
-                <Input
-                  id="headshot"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="h-20 pt-6 pb-6 file:mr-6 file:py-4 file:px-8 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-accent file:to-accent/80 file:text-black hover:file:from-accent/90 hover:file:to-accent/70 file:transition-all file:duration-200 file:shadow-md hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-200"
-                />
+                <div className="h-24 border border-input rounded-2xl bg-background hover:border-accent/50 focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-all duration-200 flex items-center justify-center">
+                  <input
+                    id="headshot"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex items-center space-x-3">
+                    <div className="py-3 px-6 rounded-2xl bg-gradient-to-r from-accent to-accent/80 text-black font-semibold text-sm hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-md">
+                      Choose File
+                    </div>
+                    {headshot && (
+                      <span className="text-sm text-muted-foreground">
+                        {headshot.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
                 {headshot && (
                   <div className="mt-2 text-sm text-accent">
                     ✓ {headshot.name} selected
