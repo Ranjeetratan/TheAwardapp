@@ -17,11 +17,9 @@ function App() {
     const checkAdminRoute = () => {
       const path = window.location.pathname
       const hash = window.location.hash
-      console.log('Checking admin route:', { path, hash })
       
       if (path === '/admin' || hash === '#admin') {
         const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
-        console.log('Admin route detected, authenticated:', isAuthenticated)
         
         if (isAuthenticated) {
           setIsAdminAuthenticated(true)
@@ -44,11 +42,9 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash
-      console.log('Hash changed to:', hash)
       
       if (hash === '#admin') {
         const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
-        console.log('Admin hash detected, authenticated:', isAuthenticated)
         
         if (isAuthenticated) {
           setIsAdminAuthenticated(true)
@@ -69,21 +65,17 @@ function App() {
   }, [])
 
   const handleAdminLogin = (password: string) => {
-    console.log('Admin login attempt with password:', password)
     if (password === 'De@dp00l') {
-      console.log('Password correct, logging in...')
       localStorage.setItem('adminAuthenticated', 'true')
       setIsAdminAuthenticated(true)
       setShowAdminLogin(false)
       window.location.hash = 'admin'
     } else {
-      console.log('Invalid password')
       alert('Invalid password')
     }
   }
 
   const handleAdminLogout = () => {
-    console.log('Admin logout')
     localStorage.removeItem('adminAuthenticated')
     setIsAdminAuthenticated(false)
     setShowAdminLogin(false)
@@ -96,22 +88,13 @@ function App() {
     setSelectedProfile(null)
   }
 
-  console.log('App render state:', {
-    showAdminLogin,
-    isAdminAuthenticated,
-    showProfilePage,
-    selectedProfile: !!selectedProfile
-  })
-
   // Admin Login
   if (showAdminLogin) {
-    console.log('Rendering AdminLogin')
     return <AdminLogin onLogin={handleAdminLogin} />
   }
 
   // Admin Panel
   if (isAdminAuthenticated) {
-    console.log('Rendering AdminPanel')
     return (
       <>
         <AdminPanel onLogout={handleAdminLogout} />
@@ -122,7 +105,6 @@ function App() {
 
   // Profile Page
   if (showProfilePage && selectedProfile) {
-    console.log('Rendering ProfilePage')
     return (
       <>
         <ProfilePage 
@@ -135,7 +117,6 @@ function App() {
   }
 
   // Main Homepage
-  console.log('Rendering HomePage')
   return (
     <>
       <HomePage />

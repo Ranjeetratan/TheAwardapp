@@ -80,6 +80,20 @@ export function ProfileCard({ profile, onClick }: ProfileCardProps) {
               </p>
             )}
 
+            {profile.role === 'investor' && (
+              <div className="mb-2">
+                {profile.investment_range && (
+                  <p className="text-sm text-accent font-medium truncate">{profile.investment_range}</p>
+                )}
+                {profile.portfolio_companies && (
+                  <p className="text-xs text-gray-400 truncate">
+                    Portfolio: {profile.portfolio_companies.split(',')[0].trim()}
+                    {profile.portfolio_companies.split(',').length > 1 && '...'}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Bio */}
             <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed">
               {profile.short_bio}

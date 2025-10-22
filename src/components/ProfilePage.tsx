@@ -310,6 +310,69 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
                   </CardContent>
                 </Card>
               )}
+
+              {profile.role === 'investor' && (
+                <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
+                  <CardContent className="p-6">
+                    <h2 className="text-2xl font-bold text-accent mb-4">Investment Profile</h2>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {profile.investment_range && (
+                          <div className="bg-background/30 rounded-lg p-4">
+                            <h3 className="text-lg font-semibold text-white mb-2">Investment Range</h3>
+                            <Badge variant="outline" className="text-base px-3 py-1 bg-green-500/20 text-green-400 border-green-500/50">
+                              {profile.investment_range}
+                            </Badge>
+                          </div>
+                        )}
+                        {profile.investment_stage && (
+                          <div className="bg-background/30 rounded-lg p-4">
+                            <h3 className="text-lg font-semibold text-white mb-2">Investment Stage</h3>
+                            <Badge variant="outline" className="text-base px-3 py-1">
+                              {profile.investment_stage}
+                            </Badge>
+                          </div>
+                        )}
+                      </div>
+
+                      {profile.investment_focus && (
+                        <div className="bg-background/30 rounded-lg p-4">
+                          <h3 className="text-lg font-semibold text-white mb-2">Investment Focus</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {profile.investment_focus.split(',').map((focus, index) => (
+                              <Badge key={index} variant="outline" className="text-base px-3 py-1">
+                                {focus.trim()}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {profile.portfolio_companies && (
+                        <div className="bg-background/30 rounded-lg p-4">
+                          <h3 className="text-lg font-semibold text-white mb-3">Portfolio Companies</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {profile.portfolio_companies.split(',').map((company, index) => (
+                              <Badge key={index} variant="secondary" className="text-sm px-3 py-1 bg-accent/20 text-accent">
+                                {company.trim()}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {profile.investment_criteria && (
+                        <div className="bg-background/30 rounded-lg p-4">
+                          <h3 className="text-lg font-semibold text-white mb-3">Investment Criteria</h3>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {profile.investment_criteria}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
