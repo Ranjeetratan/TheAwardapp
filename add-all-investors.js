@@ -21,28 +21,63 @@ const investors = [
 {"Name": "Canaan Partners","Linkedin": "linkedin.com/company/canaan-partners","Country": "USA","Flagship": "LendingClub, Instacart","Range": "US$3M–15M","Logo": "https://media.licdn.com/dms/image/v2/C560BAQE4kNyopCIviw/company-logo_200_200/company-logo_200_200/0/1631320489850?e=1762992000&v=beta&t=YOv1ggp80H50rSknpSD_aynZcqLfmq6w2uvZ2HGcQuY"},
 {"Name": "Cherubic Ventures","Linkedin": "linkedin.com/company/cherubic-ventures","Country": "USA/Taiwan","Flagship": "Calm, Flexport","Range": "US$0.5M–3M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQEWTDU3BZooCA/company-logo_200_200/B56Znbe5jXKMAI-/0/1760323934776/cherubic_ventures_logo?e=1762992000&v=beta&t=4kS5Kx1OdSnW4OLS6bY-uSXn5CZ1xoJrQvNinqttcTQ"},
 {"Name": "Coatue Management","Linkedin": "linkedin.com/company/coatue-management","Country": "USA","Flagship": "Databricks, OpenAI","Range": "US$10M–100M","Logo": "https://media.licdn.com/dms/image/v2/D4E0BAQEGLDfos3ZzOA/company-logo_200_200/company-logo_200_200/0/1665674233050/coatue_management_logo?e=1762992000&v=beta&t=4iExjC3lqnFlqfV23F1FvsOiV4-eQqsy5cy9PBTUDb4"},
+{"Name": "Craft Ventures","Linkedin": "linkedin.com/company/craft-ventures","Country": "USA","Flagship": "Notion, Mercury","Range": "US$1M–10M","Logo": "https://media.licdn.com/dms/image/v2/C4D0BAQFqF7XsObo0aA/company-logo_200_200/company-logo_200_200/0/1631300338011?e=1762992000&v=beta&t=jIc0yBUoq69Ab3rb_1y7jEbrVkR-TRPnd0AFNL-5B98"},
+{"Name": "CRV (Charles River Ventures)","Linkedin": "linkedin.com/company/crv","Country": "USA","Flagship": "Zendesk, HubSpot","Range": "US$2M–20M","Logo": "https://media.licdn.com/dms/image/v2/D4E0BAQE4tVn4O8cqGA/company-logo_200_200/company-logo_200_200/0/1737551681139/crv_logo?e=1762992000&v=beta&t=aNygJdZEunbHa2eVHHK-rUGJo14PCmvDCZ-Ln_ODJ7M"},
+{"Name": "Crosslink Capital","Linkedin": "linkedin.com/company/crosslink-capital","Country": "USA","Flagship": "Chime, Weave","Range": "US$1M–5M","Logo": "https://media.licdn.com/dms/image/v2/C560BAQHQUHpONLNXvQ/company-logo_200_200/company-logo_200_200/0/1630614538819/crosslink_capital_logo?e=1762992000&v=beta&t=JOc8A1Y-mV0Vw9DAVtvueNRkCIgS6i4i2mYnDb8BG-A"},
+{"Name": "DCVC (Data Collective)","Linkedin": "linkedin.com/company/dcvc","Country": "USA","Flagship": "Planet Labs, Rocket Lab","Range": "US$2M–10M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQGhczoQCTNECQ/company-logo_200_200/company-logo_200_200/0/1689000565965/dcvc_logo?e=1762992000&v=beta&t=oIWT8ghXrfbHXRvJ4tjiSoChzJg_U3cYUfGAMvlR6Tk"},
+{"Name": "Enterprise Ireland","Linkedin": "linkedin.com/company/enterprise-ireland","Country": "Ireland","Flagship": "Intercom, Flipdish","Range": "US$0.1M–5M","Logo": "https://media.licdn.com/dms/image/v2/D4E0BAQFhegEJ0UTScw/company-logo_200_200/company-logo_200_200/0/1681811266983/enterprise_ireland_logo?e=1762992000&v=beta&t=PAvb_lDnP6N1THFIpj7yloiaIy4QTPSBWTAh1MBJJUE"},
+{"Name": "Felicis Ventures","Linkedin": "linkedin.com/company/felicis-ventures","Country": "USA","Flagship": "Canva, Notion","Range": "US$1M–10M","Logo": "https://media.licdn.com/dms/image/v2/C4E0BAQEf7XaTsMGs9A/company-logo_200_200/company-logo_200_200/0/1677713495003/felicis_ventures_logo?e=1762992000&v=beta&t=ndcCZwImDvZ4fFPvzx8avKwwX2V-fVfAGEu8pN9Crsk"},
+{"Name": "First Round Capital","Linkedin": "linkedin.com/company/first-round-capital","Country": "USA","Flagship": "Uber, Notion","Range": "US$0.5M–5M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQGzdnk04NxhLA/company-logo_200_200/B56ZWq4d.FHQAI-/0/1742328684688/first_round_capital_logo?e=1762992000&v=beta&t=ZOWJ4pptQDDWtfJ9XaYu_rAclcQtDWjkYV6LK9hcXQo"},
+{"Name": "FJ Labs","Linkedin": "linkedin.com/company/fj-labs","Country": "USA","Flagship": "Alibaba, Uber","Range": "US$0.2M–0.5M","Logo": "https://media.licdn.com/dms/image/v2/C4D0BAQE9eaYSdQXpGg/company-logo_200_200/company-logo_200_200/0/1631350558841?e=1762992000&v=beta&t=YK5RLPtm6GI4FFNCCwrHmtPX05RfnqKZ6AAOQ5Tvdmw"},
+{"Name": "Founder Collective","Linkedin": "linkedin.com/company/founder-collective","Country": "USA","Flagship": "PillPack, The Trade Desk","Range": "US$1M–3M","Logo": "https://media.licdn.com/dms/image/v2/C4E0BAQE9mTTnueG-BQ/company-logo_200_200/company-logo_200_200/0/1630579185471/founder_collective_logo?e=1762992000&v=beta&t=F49CuYy-XLDqtaGGyUQgMt_KeA90oX6aAFEnS7ULH4c"},
+{"Name": "Forerunner Ventures","Linkedin": "linkedin.com/company/forerunner-ventures","Country": "USA","Flagship": "Warby Parker, Glossier","Range": "US$1M–5M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQHbLmE_pk5_sA/company-logo_200_200/B56ZWwXvOUGUAI-/0/1742420768858/forerunner_ventures_logo?e=1762992000&v=beta&t=jgicC5Is6ODqN--_jfC7a9csIMCCuC4AGkAO7ccdLjc"},
+{"Name": "Gaingels","Linkedin": "linkedin.com/company/gaingels","Country": "USA","Flagship": "Clubhouse, Bolt","Range": "US$0.2M–2M","Logo": "https://media.licdn.com/dms/image/v2/C4D0BAQFYCB4IYXq3qQ/company-logo_200_200/company-logo_200_200/0/1630521535094/gaingels_logo?e=1762992000&v=beta&t=0vxmes6bVzoeZz58ikyc_ZiKxDsYQUpnRV6Yqd7G-LM"},
+{"Name": "Georgian Partners","Linkedin": "linkedin.com/company/georgian","Country": "Canada","Flagship": "Shopify, WorkFusion","Range": "US$2M–10M","Logo": "https://media.licdn.com/dms/image/v2/C560BAQGfrqh9eCt9bw/company-logo_200_200/company-logo_200_200/0/1630657431036/georgian_logo?e=1762992000&v=beta&t=l9rnBg83fSuPrmRNP8BHVuJx2SYbunEtWOglMm-URrQ"},
+{"Name": "GGV Capital","Linkedin": "linkedin.com/company/ggv-capital","Country": "USA","Flagship": "Slack, Airbnb","Range": "US$5M–30M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQGcEMQrGXUKBg/company-logo_200_200/company-logo_200_200/0/1711739018694/ggv_capital_logo?e=1762992000&v=beta&t=nkTsMdbvMtVvkgEjp3vy3j9G33NRzsfHHGYgdZh2mXg"},
+{"Name": "Global Founders Capital","Linkedin": "linkedin.com/company/global-founders-capital","Country": "Germany","Flagship": "Canva, Revolut","Range": "US$1M–10M","Logo": "https://media.licdn.com/dms/image/v2/C4D0BAQGxsJZppAztHg/company-logo_200_200/company-logo_200_200/0/1630525414498/global_founders_capital_logo?e=1762992000&v=beta&t=E0qDHqxGGQ56WLnDWsEILqfXQXQ6gHGgqZM57Spjzkw"},
+{"Name": "Goodwater Capital","Linkedin": "linkedin.com/company/goodwater-capital","Country": "USA","Flagship": "Monzo, Toss","Range": "US$2M–20M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQHApKaNHIBgAQ/company-logo_200_200/company-logo_200_200/0/1666825657124/goodwater_capital_logo?e=1762992000&v=beta&t=jBtnIdAhN3L7EzefN64yMTHVbfJpAeKhciD2WwrHUpM"},
+{"Name": "GoAhead Ventures","Linkedin": "linkedin.com/company/goahead-ventures","Country": "USA","Flagship": "Early AI/ML startups","Range": "US$0.5M–1M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQETlCDwGmx3Hw/company-logo_200_200/company-logo_200_200/0/1693322538972/goahead_ventures_logo?e=1762992000&v=beta&t=TMhlvEZk3vCWDxCVPio6aEDygdaD8CLWjis33C1K6Lk"},
+{"Name": "Greylock Partners","Linkedin": "linkedin.com/company/greylock-partners","Country": "USA","Flagship": "Airbnb, LinkedIn","Range": "US$5M–50M","Logo": "https://media.licdn.com/dms/image/v2/D560BAQHZfaCTQg-MEg/company-logo_200_200/company-logo_200_200/0/1696309893203/greylock_partners_logo?e=1762992000&v=beta&t=Eho7eO8Oxf8PGDtwAC8XD9h8GImutrWw5EYB3yFRwYE"},
 {"Name": "Y Combinator","Linkedin": "linkedin.com/company/y-combinator","Country": "USA","Flagship": "Dropbox, Airbnb","Range": "US$0.125M–0.5M","Logo": "https://media.licdn.com/dms/image/v2/C4D0BAQGPzdBPNxrmEg/company-logo_200_200/company-logo_200_200/0/1673555093250/y_combinator_logo?e=1762992000&v=beta&t=5hHJwShvaLj3qZj_jWWatMYC5zC5WC6jvp-GEBsZFxw"}
 ]
 
 // Map investment ranges to allowed values
 function mapInvestmentRange(range) {
-  if (range.includes('0.125M') || range.includes('0.25M')) return '$100K-$500K'
-  if (range.includes('0.75M') || range.includes('1M') && !range.includes('10M')) return '$500K-$1M'
+  if (range.includes('0.05M') || range.includes('0.1M') || range.includes('0.125M') || range.includes('0.2M') || range.includes('0.25M')) return '$100K-$500K'
+  if (range.includes('0.5M') || range.includes('0.75M') || range.includes('1M') && !range.includes('10M')) return '$500K-$1M'
   if (range.includes('2M') || range.includes('3M') || range.includes('5M')) return '$1M-$5M'
-  if (range.includes('10M') || range.includes('15M') || range.includes('20M') || range.includes('30M') || range.includes('40M') || range.includes('50M')) return '$5M+'
-  if (range.includes('100M')) return '$5M+'
+  if (range.includes('10M') || range.includes('15M') || range.includes('20M') || range.includes('30M') || range.includes('40M') || range.includes('50M') || range.includes('100M')) return '$5M+'
   return '$1M-$5M' // default
 }
 
 function mapInvestmentStage(range) {
-  if (range.includes('0.125M') || range.includes('0.25M') || range.includes('0.75M')) return 'Angel'
-  if (range.includes('1M') && !range.includes('10M')) return 'Seed'
+  if (range.includes('0.05M') || range.includes('0.1M') || range.includes('0.125M') || range.includes('0.2M') || range.includes('0.25M')) return 'Angel'
+  if (range.includes('0.5M') || range.includes('0.75M') || range.includes('1M') && !range.includes('10M')) return 'Seed'
   if (range.includes('2M') || range.includes('3M') || range.includes('5M')) return 'Series A'
   return 'Series B+'
 }
 
-async function addInvestors() {
-  console.log('Adding investors to database...')
+async function clearExistingInvestors() {
+  console.log('Clearing existing investor profiles...')
+  const { error } = await supabase
+    .from('profiles')
+    .delete()
+    .eq('role', 'investor')
+  
+  if (error) {
+    console.error('Error clearing investors:', error)
+  } else {
+    console.log('✓ Cleared existing investors')
+  }
+}
+
+async function addAllInvestors() {
+  console.log('Adding all investors to database...')
+  
+  // Clear existing investors first
+  await clearExistingInvestors()
+  
+  const featuredInvestors = ['Y Combinator', 'Andreessen Horowitz', '83North (Greylock IL)', 'Benchmark', 'A16Z Speedrun', 'Greylock Partners']
   
   for (const investor of investors) {
     const profile = {
@@ -61,7 +96,7 @@ async function addInvestors() {
       portfolio_companies: investor.Flagship,
       investment_criteria: 'Strong team, proven traction, scalable business model',
       approved: true,
-      featured: ['Y Combinator', 'Andreessen Horowitz', '83North (Greylock IL)', 'Benchmark', 'A16Z Speedrun'].includes(investor.Name)
+      featured: featuredInvestors.includes(investor.Name)
     }
 
     try {
@@ -80,7 +115,7 @@ async function addInvestors() {
     }
   }
   
-  console.log('Finished adding investors!')
+  console.log('Finished adding all investors!')
 }
 
-addInvestors()
+addAllInvestors()

@@ -24,6 +24,7 @@ export function HomePage() {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [showStickySearch, setShowStickySearch] = useState(true)
   const faqRef = useRef<HTMLDivElement>(null)
+  const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'founder' | 'cofounder' | 'investor'>('all')
   const [filters, setFilters] = useState({
     location: [] as string[],
     industry: [] as string[],
@@ -140,6 +141,11 @@ export function HomePage() {
   }
 
   const filteredProfiles = processedProfiles.filter(profile => {
+    // Role filter
+    if (activeRoleFilter !== 'all' && profile.role !== activeRoleFilter) {
+      return false
+    }
+
     // Search filter
     if (searchQuery) {
       const searchLower = searchQuery.toLowerCase()
@@ -184,6 +190,16 @@ export function HomePage() {
     // Experience filter (for cofounders)
     if (filters.experience.length > 0 && profile.role === 'cofounder' && profile.experience_level) {
       if (!filters.experience.includes(profile.experience_level)) return false
+    }
+
+    // Investment range filter (for investors)
+    if (filters.investmentRange.length > 0 && profile.role === 'investor' && profile.investment_range) {
+      if (!filters.investmentRange.includes(profile.investment_range)) return false
+    }
+
+    // Investment type filter (for investors)
+    if (filters.investmentType.length > 0 && profile.role === 'investor' && profile.investment_stage) {
+      if (!filters.investmentType.includes(profile.investment_stage)) return false
     }
 
     return true
@@ -312,9 +328,33 @@ export function HomePage() {
               />
             </motion.div>
             
+            {/* Role Filter Buttons */}
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center space-x-2 bg-card/30 p-1 rounded-xl border border-accent/20">
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'founder', label: 'Founders' },
+                  { key: 'cofounder', label: 'Co-founders' },
+                  { key: 'investor', label: 'Investors' }
+                ].map((role) => (
+                  <button
+                    key={role.key}
+                    onClick={() => setActiveRoleFilter(role.key as any)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      activeRoleFilter === role.key
+                        ? 'bg-accent text-black shadow-lg'
+                        : 'text-muted-foreground hover:text-white hover:bg-card/50'
+                    }`}
+                  >
+                    {role.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
             <div className="flex justify-center">
               <HorizontalFilters
-                activeTab="all"
+                activeTab={activeRoleFilter === 'all' ? 'all' : activeRoleFilter === 'founder' ? 'founders' : activeRoleFilter === 'cofounder' ? 'cofounders' : 'investors'}
                 filters={filters}
                 onFilterChange={handleFilterChange}
                 onClearFilters={handleClearFilters}
