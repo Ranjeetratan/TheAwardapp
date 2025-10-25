@@ -7,6 +7,7 @@ import { ProfileCard } from './ProfileCard'
 import { ProfileModal } from './ProfileModal'
 import { ProfileForm } from './ProfileForm'
 import { ProfilePage } from './ProfilePage'
+import { WhatsNext } from './WhatsNext'
 import { FAQ } from './FAQ'
 import { Footer } from './Footer'
 import { profileCache, preloadProfiles } from '../App'
@@ -465,6 +466,9 @@ export function HomePage() {
           )}
         </div>
       </section>
+
+      {/* What's Next Section */}
+      <WhatsNext />
 
       {/* FAQ Section */}
       <div ref={faqRef}>

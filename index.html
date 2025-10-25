@@ -38,7 +38,17 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-GPNTX4Z409');
+      gtag('config', 'G-GPNTX4Z409', {
+        page_title: 'CofounderBase - Find Your Perfect Cofounder',
+        page_location: window.location.href,
+        send_page_view: true
+      });
+      
+      // Send a test event to verify tracking is working
+      gtag('event', 'page_view', {
+        page_title: 'CofounderBase Homepage',
+        page_location: window.location.href
+      });
     </script>
     
     <!-- Structured Data -->

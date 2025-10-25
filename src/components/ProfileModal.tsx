@@ -4,6 +4,7 @@ import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { X, MapPin, Clock, Briefcase, User, Star, Globe, Eye, Mail } from 'lucide-react'
+import { trackProfileView, trackContactClick } from '../lib/analytics'
 import type { Profile } from '../lib/supabase'
 
 interface ProfileModalProps {
@@ -18,6 +19,10 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      // Track profile view when modal opens
+      if (profile) {
+        trackProfileView(profile.id || 'unknown', profile.role)
+      }
     } else {
       document.body.style.overflow = 'unset'
     }
@@ -26,7 +31,7 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen])
+  }, [isOpen, profile])
 
   // Helper function to properly capitalize names and titles
   const toTitleCase = (str: string) => {
@@ -139,7 +144,10 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
                         <div className="flex space-x-2">
                           <Button
                             size="sm"
-                            onClick={() => window.open(profile.linkedin_profile, '_blank')}
+                            onClick={() => {
+                              trackContactClick('linkedin', profile.role)
+                              window.open(profile.linkedin_profile, '_blank')
+                            }}
                             className="bg-[#0077B5] hover:bg-[#005885] text-white flex items-center gap-1"
                           >
                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -149,11 +157,44 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => window.open(`mailto:${profile.email}`, '_blank')}
+                            onClick={() => {
+                              trackContactClick('email', profile.role)
+                              window.open(`mailto:${profile.email}`, '_blank')
+                            }}
                             className="bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-1"
                           >
                             <Mail className="w-4 h-4" />
                             Email
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={async () => {
+                              trackContactClick('share', profile.role)
+                              const profileUrl = `${window.location.origin}/profile/${profile.id}`
+                              if (navigator.share) {
+                                try {
+                                  await navigator.share({
+                                    title: `${profile.full_name} - ${profile.role} on CofounderBase`,
+                                    text: `Check out ${profile.full_name}'s profile on CofounderBase`,
+                                    url: profileUrl
+                                  })
+                                } catch (err) {
+                                  // Fallback to clipboard
+                                  navigator.clipboard.writeText(profileUrl)
+                                  alert('Profile URL copied to clipboard!')
+                                }
+                              } else {
+                                // Fallback to clipboard
+                                navigator.clipboard.writeText(profileUrl)
+                                alert('Profile URL copied to clipboard!')
+                              }
+                            }}
+                            className="bg-accent hover:bg-accent/90 text-black flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                            </svg>
+                            Share
                           </Button>
                           {profile.website_portfolio && (
                             <Button

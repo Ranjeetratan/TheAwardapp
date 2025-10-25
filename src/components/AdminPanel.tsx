@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
+import { testGoogleAnalytics } from '../lib/analytics'
 import type { Profile, Advertisement } from '../lib/supabase'
 
 interface AdminPanelProps {
@@ -24,6 +25,7 @@ declare global {
     testProfileInsert: () => Promise<void>
     debugProfileCounts: () => Promise<void>
     approveAllProfiles: () => Promise<void>
+    testGoogleAnalytics: () => any
   }
 }
 
@@ -163,6 +165,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
       } catch (err) {
         console.error('Approve all error:', err)
       }
+    }
+
+    window.testGoogleAnalytics = () => {
+      return testGoogleAnalytics()
     }
   }, [])
 
