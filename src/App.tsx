@@ -110,7 +110,7 @@ function App() {
   }, [])
 
   const handleAdminLogin = (password: string) => {
-    if (password === 'De@dp00l') {
+    if (password === 'W9@cZt7!mQ#4rTf%X2^vBp8&') {
       localStorage.setItem('adminAuthenticated', 'true')
       setIsAdminAuthenticated(true)
       setShowAdminLogin(false)
@@ -127,6 +127,18 @@ function App() {
     window.location.hash = ''
     window.location.reload()
   }
+
+  // Additional security: Clear admin session after 2 hours
+  useEffect(() => {
+    if (isAdminAuthenticated) {
+      const timeout = setTimeout(() => {
+        handleAdminLogout()
+        alert('Admin session expired for security. Please login again.')
+      }, 2 * 60 * 60 * 1000) // 2 hours
+
+      return () => clearTimeout(timeout)
+    }
+  }, [isAdminAuthenticated])
 
   const handleBackFromProfile = () => {
     setShowProfilePage(false)

@@ -6,6 +6,7 @@ import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { supabase, type Profile } from '../lib/supabase'
+import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
 import { ChevronLeft, ChevronRight, Check, User, Briefcase, FileText, Eye } from 'lucide-react'
 
 interface ProfileFormProps {
@@ -198,6 +199,28 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
       }
 
       console.log('Profile submitted successfully:', data[0])
+      
+      // Since profiles are auto-approved, send welcome email immediately
+      if (data[0]) {
+        try {
+          const emailSent = await sendProfileLiveEmail({
+            first_name: getFirstName(formData.full_name),
+            profile_url: generateProfileUrl(data[0].id),
+            full_name: formData.full_name,
+            email: formData.email,
+            role: role
+          })
+          
+          if (emailSent) {
+            console.log('Welcome email sent successfully')
+          } else {
+            console.log('Welcome email failed to send')
+          }
+        } catch (emailError) {
+          console.error('Email notification error:', emailError)
+        }
+      }
+      
       setIsSubmitted(true)
     } catch (error) {
       console.error('Error submitting profile:', error)

@@ -26,6 +26,7 @@ declare global {
     debugProfileCounts: () => Promise<void>
     approveAllProfiles: () => Promise<void>
     testGoogleAnalytics: () => any
+    createTestPendingProfile: () => Promise<void>
   }
 }
 
@@ -169,6 +170,37 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
     window.testGoogleAnalytics = () => {
       return testGoogleAnalytics()
+    }
+
+    window.createTestPendingProfile = async () => {
+      try {
+        console.log('Creating test pending profile...')
+        const testProfile = {
+          full_name: 'Test Pending User',
+          email: 'pending@example.com',
+          location: 'Test City',
+          linkedin_profile: 'https://linkedin.com/in/testpending',
+          short_bio: 'Test pending profile for approval testing',
+          availability: 'Full-time',
+          looking_for: 'Test approval flow',
+          role: 'founder' as const,
+          startup_name: 'Test Startup',
+          startup_stage: 'Idea',
+          industry: 'Testing',
+          approved: false, // This will create a pending profile
+          featured: false
+        }
+        const { data, error } = await supabase.from('profiles').insert([testProfile]).select()
+        
+        if (error) {
+          console.error('Error creating test profile:', error)
+        } else {
+          console.log('Test pending profile created:', data)
+          fetchProfiles() // Refresh the admin panel
+        }
+      } catch (err) {
+        console.error('Create test profile error:', err)
+      }
     }
   }, [])
 
