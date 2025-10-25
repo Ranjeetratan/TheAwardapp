@@ -3,7 +3,7 @@ import { MessageCircle } from 'lucide-react'
 
 export function SupportButton() {
   const handleSupportClick = () => {
-    window.open('https://www.linkedin.com/in/ranjit-kumar-ds/', '_blank')
+    window.open('https://www.linkedin.com/in/ranjeet-ratan-59a221203/', '_blank')
   }
 
   return (

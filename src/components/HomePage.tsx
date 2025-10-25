@@ -237,8 +237,11 @@ export function HomePage() {
   }
 
   const handleProfileClick = (profile: Profile) => {
+    // Navigate to profile URL
+    const profileUrl = `/profile/${profile.id}`
+    window.history.pushState({}, '', profileUrl)
     setSelectedProfile(profile)
-    setIsModalOpen(true)
+    setShowProfilePage(true)
   }
 
   const closeModal = () => {
@@ -253,6 +256,8 @@ export function HomePage() {
   }
 
   const handleBackFromProfile = () => {
+    // Navigate back to home
+    window.history.pushState({}, '', '/')
     setShowProfilePage(false)
     setSelectedProfile(null)
   }

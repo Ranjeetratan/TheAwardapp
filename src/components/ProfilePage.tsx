@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Card, CardContent } from './ui/card'
-import { ArrowLeft, MapPin, Clock, Briefcase, User, Star, Globe, Mail, Calendar, Plus, Share2 } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, Briefcase, User, Star, Globe, Calendar, Plus, Share2 } from 'lucide-react'
 import type { Profile } from '../lib/supabase'
 
 interface ProfilePageProps {
@@ -163,13 +163,7 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
                       </svg>
                       LinkedIn
                     </Button>
-                    <Button
-                      onClick={() => window.open(`mailto:${profile.email}`, '_blank')}
-                      className="bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2 px-6 py-3 text-base"
-                    >
-                      <Mail className="w-5 h-5" />
-                      Email
-                    </Button>
+
                     <Button
                       onClick={handleShareProfile}
                       className="bg-accent hover:bg-accent/90 text-black flex items-center gap-2 px-6 py-3 text-base"

@@ -12,7 +12,7 @@ export function WhatsNext() {
       description: "Secure authentication system with personalized dashboards for founders and co-founders",
       icon: Shield,
       status: "in-progress",
-      timeline: "Q1 2025",
+      timeline: "Q1 2026",
       features: ["Secure authentication", "Personal dashboards", "Profile management", "Privacy controls"]
     },
     {
@@ -20,7 +20,7 @@ export function WhatsNext() {
       description: "Chat directly with founders and co-founders without leaving the platform",
       icon: MessageCircle,
       status: "planned",
-      timeline: "Q2 2025",
+      timeline: "Q2 2026",
       features: ["Real-time messaging", "File sharing", "Message history", "Notification system"]
     },
     {
@@ -28,7 +28,7 @@ export function WhatsNext() {
       description: "Schedule meetings and show availability directly on your profile",
       icon: Calendar,
       status: "planned",
-      timeline: "Q2 2025",
+      timeline: "Q2 2026",
       features: ["Availability display", "Meeting scheduling", "Calendar sync", "Time zone support"]
     },
     {
@@ -36,7 +36,7 @@ export function WhatsNext() {
       description: "AI-powered matching system to find the perfect co-founder based on skills and goals",
       icon: Search,
       status: "planned",
-      timeline: "Q3 2025",
+      timeline: "Q3 2026",
       features: ["Smart recommendations", "Compatibility scoring", "Skill matching", "Goal alignment"]
     },
     {
@@ -44,7 +44,7 @@ export function WhatsNext() {
       description: "Collaborative tools for building and managing your founding team",
       icon: Users,
       status: "planned",
-      timeline: "Q3 2025",
+      timeline: "Q3 2026",
       features: ["Team workspaces", "Task management", "Document sharing", "Progress tracking"]
     },
     {
@@ -52,7 +52,7 @@ export function WhatsNext() {
       description: "Curated resources, templates, and tools to help you build your startup",
       icon: Sparkles,
       status: "planned",
-      timeline: "Q4 2025",
+      timeline: "Q4 2026",
       features: ["Startup templates", "Legal documents", "Funding guides", "Expert mentorship"]
     }
   ]
@@ -174,13 +174,13 @@ export function WhatsNext() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => window.open('mailto:ranjeet@cofounderbase.com?subject=Feature Request', '_blank')}
+                onClick={() => window.open('https://www.linkedin.com/in/ranjeet-ratan-59a221203/', '_blank')}
                 className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-lg hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
               >
                 Share Your Ideas
               </button>
               <button
-                onClick={() => window.open('https://www.linkedin.com/in/iamrupesh/', '_blank')}
+                onClick={() => window.open('https://www.linkedin.com/in/ranjeet-ratan-59a221203/', '_blank')}
                 className="px-6 py-3 border border-accent/30 text-accent font-semibold rounded-lg hover:bg-accent/10 transition-all duration-200"
               >
                 Connect with Founder

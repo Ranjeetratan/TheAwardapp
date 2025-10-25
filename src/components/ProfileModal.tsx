@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
-import { X, MapPin, Clock, Briefcase, User, Star, Globe, Eye, Mail } from 'lucide-react'
+import { X, MapPin, Clock, Briefcase, User, Star, Globe, Eye } from 'lucide-react'
 import { trackProfileView, trackContactClick } from '../lib/analytics'
 import type { Profile } from '../lib/supabase'
 
@@ -155,17 +155,7 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
                             </svg>
                             LinkedIn
                           </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              trackContactClick('email', profile.role)
-                              window.open(`mailto:${profile.email}`, '_blank')
-                            }}
-                            className="bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-1"
-                          >
-                            <Mail className="w-4 h-4" />
-                            Email
-                          </Button>
+
                           <Button
                             size="sm"
                             onClick={async () => {

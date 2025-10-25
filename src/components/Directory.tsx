@@ -168,6 +168,10 @@ export function Directory({ activeTab, searchQuery, filters, onViewFullProfile }
   })
 
   const handleProfileClick = (profile: Profile) => {
+    // Navigate to profile URL
+    const profileUrl = `/profile/${profile.id}`
+    window.history.pushState({}, '', profileUrl)
+    // For Directory component, we'll still use modal for now
     setSelectedProfile(profile)
     setIsModalOpen(true)
   }

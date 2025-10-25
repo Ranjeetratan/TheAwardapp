@@ -57,12 +57,13 @@ function App() {
     preloadProfiles()
   }, [])
 
-  // Check URL for admin route
+  // Check URL for admin route and profile routes
   useEffect(() => {
-    const checkAdminRoute = () => {
+    const checkRoutes = async () => {
       const path = window.location.pathname
       const hash = window.location.hash
       
+      // Check for admin route
       if (path === '/admin' || hash === '#admin') {
         const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
         
@@ -73,22 +74,53 @@ function App() {
           setShowAdminLogin(true)
           setIsAdminAuthenticated(false)
         }
-      } else {
-        // Reset admin states when not on admin route
-        setIsAdminAuthenticated(false)
-        setShowAdminLogin(false)
+        return
       }
+      
+      // Check for profile route
+      const profileMatch = path.match(/^\/profile\/(.+)$/)
+      if (profileMatch) {
+        const profileId = profileMatch[1]
+        try {
+          // Fetch the specific profile
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', profileId)
+            .eq('approved', true)
+            .single()
+          
+          if (!error && data) {
+            setSelectedProfile(data)
+            setShowProfilePage(true)
+            return
+          }
+        } catch (err) {
+          console.error('Error fetching profile:', err)
+        }
+        // If profile not found, redirect to home
+        window.history.pushState({}, '', '/')
+        return
+      }
+      
+      // Reset states for other routes
+      setIsAdminAuthenticated(false)
+      setShowAdminLogin(false)
+      setShowProfilePage(false)
+      setSelectedProfile(null)
     }
 
-    checkAdminRoute()
+    checkRoutes()
   }, [])
 
-  // Listen for hash changes
+  // Listen for navigation changes (back/forward buttons)
   useEffect(() => {
-    const handleHashChange = () => {
+    const handlePopState = async () => {
+      const path = window.location.pathname
       const hash = window.location.hash
       
-      if (hash === '#admin') {
+      // Handle admin routes
+      if (path === '/admin' || hash === '#admin') {
         const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
         
         if (isAuthenticated) {
@@ -98,15 +130,42 @@ function App() {
           setShowAdminLogin(true)
           setIsAdminAuthenticated(false)
         }
-      } else {
-        // Reset admin states when hash is not admin
-        setIsAdminAuthenticated(false)
-        setShowAdminLogin(false)
+        return
       }
+      
+      // Handle profile routes
+      const profileMatch = path.match(/^\/profile\/(.+)$/)
+      if (profileMatch) {
+        const profileId = profileMatch[1]
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', profileId)
+            .eq('approved', true)
+            .single()
+          
+          if (!error && data) {
+            setSelectedProfile(data)
+            setShowProfilePage(true)
+            setIsAdminAuthenticated(false)
+            setShowAdminLogin(false)
+            return
+          }
+        } catch (err) {
+          console.error('Error fetching profile:', err)
+        }
+      }
+      
+      // Reset to homepage
+      setIsAdminAuthenticated(false)
+      setShowAdminLogin(false)
+      setShowProfilePage(false)
+      setSelectedProfile(null)
     }
 
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   const handleAdminLogin = (password: string) => {
