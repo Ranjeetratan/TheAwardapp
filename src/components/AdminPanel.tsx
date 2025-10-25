@@ -22,6 +22,8 @@ declare global {
   interface Window {
     testSupabaseConnection: () => Promise<void>
     testProfileInsert: () => Promise<void>
+    debugProfileCounts: () => Promise<void>
+    approveAllProfiles: () => Promise<void>
   }
 }
 
@@ -67,6 +69,58 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         console.error('Connection test error:', err)
       }
     }
+
+    window.debugProfileCounts = async () => {
+      try {
+        console.log('=== DEBUGGING PROFILE COUNTS ===')
+        
+        // Get all profiles
+        const { data: allProfiles, error: allError } = await supabase
+          .from('profiles')
+          .select('role, approved')
+        
+        if (allError) {
+          console.error('Error fetching all profiles:', allError)
+          return
+        }
+
+        // Get approved profiles only
+        const { data: approvedProfiles, error: approvedError } = await supabase
+          .from('profiles')
+          .select('role, approved')
+          .eq('approved', true)
+        
+        if (approvedError) {
+          console.error('Error fetching approved profiles:', approvedError)
+          return
+        }
+
+        console.log('ALL PROFILES:', allProfiles)
+        console.log('APPROVED PROFILES:', approvedProfiles)
+        
+        // Count by role - all profiles
+        const allCounts = allProfiles.reduce((acc: any, p: any) => {
+          acc[p.role] = (acc[p.role] || 0) + 1
+          return acc
+        }, {})
+        
+        // Count by role - approved profiles
+        const approvedCounts = approvedProfiles.reduce((acc: any, p: any) => {
+          acc[p.role] = (acc[p.role] || 0) + 1
+          return acc
+        }, {})
+        
+        console.log('ALL PROFILE COUNTS:', allCounts)
+        console.log('APPROVED PROFILE COUNTS:', approvedCounts)
+        
+        // Show unapproved profiles
+        const unapproved = allProfiles.filter(p => !p.approved)
+        console.log('UNAPPROVED PROFILES:', unapproved)
+        
+      } catch (err) {
+        console.error('Debug error:', err)
+      }
+    }
     
     window.testProfileInsert = async () => {
       try {
@@ -87,6 +141,27 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         console.log('Insert test result:', { data, error })
       } catch (err) {
         console.error('Insert test error:', err)
+      }
+    }
+
+    window.approveAllProfiles = async () => {
+      try {
+        console.log('Approving all pending profiles...')
+        const { data, error } = await supabase
+          .from('profiles')
+          .update({ approved: true })
+          .eq('approved', false)
+          .select()
+        
+        if (error) {
+          console.error('Error approving profiles:', error)
+        } else {
+          console.log('Successfully approved profiles:', data)
+          // Refresh the admin panel data
+          fetchProfiles()
+        }
+      } catch (err) {
+        console.error('Approve all error:', err)
       }
     }
   }, [])
@@ -768,6 +843,35 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
+              {stats.pendingProfiles > 0 && (
+                <Button
+                  onClick={async () => {
+                    if (confirm(`Approve all ${stats.pendingProfiles} pending profiles?`)) {
+                      try {
+                        const { error } = await supabase
+                          .from('profiles')
+                          .update({ approved: true })
+                          .eq('approved', false)
+                        
+                        if (error) {
+                          alert('Error approving profiles: ' + error.message)
+                        } else {
+                          alert(`Successfully approved ${stats.pendingProfiles} profiles!`)
+                          fetchProfiles()
+                        }
+                      } catch (err) {
+                        alert('Error: ' + err)
+                      }
+                    }
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-green-500/50 text-green-400 hover:bg-green-500/10"
+                >
+                  <UserCheck className="w-4 h-4 mr-2" />
+                  Approve All ({stats.pendingProfiles})
+                </Button>
+              )}
               <Button
                 onClick={onLogout}
                 variant="outline"
@@ -795,7 +899,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                 <p className="text-sm text-gray-400">Total Profiles</p>
                 <p className="text-3xl font-bold text-white">{stats.totalProfiles}</p>
                 <p className="text-xs text-green-400 mt-1">
-                  {stats.approvedProfiles} approved
+                  {stats.approvedProfiles} approved, {stats.pendingProfiles} pending
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -814,7 +918,9 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               <div>
                 <p className="text-sm text-gray-400">Founders</p>
                 <p className="text-3xl font-bold text-white">{stats.foundersCount}</p>
-                <p className="text-xs text-purple-400 mt-1">Building startups</p>
+                <p className="text-xs text-purple-400 mt-1">
+                  {profiles.filter(p => p.role === 'founder' && p.approved).length} live
+                </p>
               </div>
               <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-purple-400" />
@@ -832,7 +938,9 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               <div>
                 <p className="text-sm text-gray-400">Co-founders</p>
                 <p className="text-3xl font-bold text-white">{stats.cofoundersCount}</p>
-                <p className="text-xs text-green-400 mt-1">Ready to join</p>
+                <p className="text-xs text-green-400 mt-1">
+                  {profiles.filter(p => p.role === 'cofounder' && p.approved).length} live
+                </p>
               </div>
               <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
                 <UserCheck className="w-6 h-6 text-green-400" />
@@ -850,7 +958,9 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               <div>
                 <p className="text-sm text-gray-400">Investors</p>
                 <p className="text-3xl font-bold text-white">{stats.investorsCount}</p>
-                <p className="text-xs text-yellow-400 mt-1">Active investors</p>
+                <p className="text-xs text-yellow-400 mt-1">
+                  {profiles.filter(p => p.role === 'investor' && p.approved).length} live
+                </p>
               </div>
               <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
                 <DollarSign className="w-6 h-6 text-yellow-400" />
