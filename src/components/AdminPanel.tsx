@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+// Removed unused Card imports
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { 
   Users, UserCheck, UserX, TrendingUp, Star, Plus, Edit, Trash2, Megaphone, LogOut, EyeOff, 
-  BarChart3, DollarSign, Building2, Briefcase, Search, Filter, MoreHorizontal, 
-  Calendar, Globe, Mail, Linkedin, ExternalLink, RefreshCw, Settings, Bell
+  BarChart3, DollarSign, Search, Globe, Mail, Linkedin, RefreshCw
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
 import type { Profile, Advertisement } from '../lib/supabase'
 
 interface AdminPanelProps {
@@ -38,7 +38,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   })
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'founders' | 'cofounders' | 'investors' | 'ads'>('overview')
-  const [editingAd, setEditingAd] = useState<Advertisement | null>(null)
+  // editingAd removed - not used in current implementation
   const [newAd, setNewAd] = useState({
     title: '',
     description: '',
@@ -46,7 +46,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     cta_url: '',
     is_active: true
   })
-  const [editingProfile, setEditingProfile] = useState<Profile | null>(null)
+  // editingProfile removed - not used in current implementation
 
   useEffect(() => {
     fetchProfiles()
@@ -172,6 +172,11 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleApprove = async (profileId: string | undefined) => {
     if (!profileId) return
+    
+    // Find the profile to get user details for email
+    const profile = profiles.find(p => p.id === profileId)
+    if (!profile) return
+
     try {
       const { error } = await supabase
         .from('profiles')
@@ -180,16 +185,38 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
       if (error) {
         console.error('Error approving profile:', error)
+        alert('Error approving profile. Please try again.')
       } else {
-        setProfiles(prev => prev.map(p => 
+        // Update local state
+        const updatedProfiles = profiles.map(p => 
           p.id === profileId ? { ...p, approved: true } : p
-        ))
-        calculateStats(profiles.map(p => 
-          p.id === profileId ? { ...p, approved: true } : p
-        ))
+        )
+        setProfiles(updatedProfiles)
+        calculateStats(updatedProfiles)
+
+        // Send profile live email notification
+        try {
+          const emailSent = await sendProfileLiveEmail({
+            first_name: getFirstName(profile.full_name),
+            profile_url: generateProfileUrl(profileId),
+            full_name: profile.full_name,
+            email: profile.email,
+            role: profile.role
+          })
+
+          if (emailSent) {
+            alert('Profile approved successfully! Welcome email sent to user.')
+          } else {
+            alert('Profile approved successfully! (Email notification failed - check Loop configuration)')
+          }
+        } catch (emailError) {
+          console.error('Email notification error:', emailError)
+          alert('Profile approved successfully! (Email notification failed)')
+        }
       }
     } catch (error) {
       console.error('Error:', error)
+      alert('Network error. Please try again.')
     }
   }
 
@@ -275,32 +302,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     }
   }
 
-  const handleUpdateAd = async (ad: Advertisement) => {
-    try {
-      const { error } = await supabase
-        .from('advertisements')
-        .update({
-          title: ad.title,
-          description: ad.description,
-          cta_text: ad.cta_text,
-          cta_url: ad.cta_url,
-          is_active: ad.is_active,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', ad.id)
-
-      if (error) {
-        console.error('Error updating advertisement:', error)
-      } else {
-        setAdvertisements(prev => prev.map(a => 
-          a.id === ad.id ? ad : a
-        ))
-        setEditingAd(null)
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
+  // handleUpdateAd removed - not used in current implementation
 
   const handleDeleteAd = async (adId: string) => {
     try {
@@ -364,66 +366,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     }
   }
 
-  const handleUpdateProfile = async (profile: Profile) => {
-    try {
-      const updateData: any = {
-        // Basic fields
-        full_name: profile.full_name,
-        email: profile.email,
-        location: profile.location,
-        linkedin_profile: profile.linkedin_profile,
-        website_portfolio: profile.website_portfolio,
-        headshot_url: profile.headshot_url,
-        short_bio: profile.short_bio,
-        availability: profile.availability,
-        timezone: profile.timezone,
-        looking_for: profile.looking_for,
-        updated_at: new Date().toISOString()
-      }
-
-      // Role-specific fields
-      if (profile.role === 'founder') {
-        updateData.startup_name = profile.startup_name
-        updateData.startup_stage = profile.startup_stage
-        updateData.industry = profile.industry
-        updateData.what_building = profile.what_building
-        updateData.looking_for_cofounder = profile.looking_for_cofounder
-        updateData.company_size = profile.company_size
-        updateData.funding_stage = profile.funding_stage
-      } else if (profile.role === 'cofounder') {
-        updateData.skills_expertise = profile.skills_expertise
-        updateData.experience_level = profile.experience_level
-        updateData.industry_interests = profile.industry_interests
-        updateData.past_projects = profile.past_projects
-        updateData.why_join_startup = profile.why_join_startup
-      } else if (profile.role === 'investor') {
-        updateData.investment_range = profile.investment_range
-        updateData.investment_stage = profile.investment_stage
-        updateData.investment_focus = profile.investment_focus
-        updateData.portfolio_companies = profile.portfolio_companies
-        updateData.investment_criteria = profile.investment_criteria
-      }
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', profile.id)
-
-      if (error) {
-        console.error('Error updating profile:', error)
-        alert('Error updating profile. Please try again.')
-      } else {
-        setProfiles(prev => prev.map(p => 
-          p.id === profile.id ? profile : p
-        ))
-        setEditingProfile(null)
-        alert('Profile updated successfully!')
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      alert('Error updating profile. Please try again.')
-    }
-  }
+  // handleUpdateProfile removed - not used in current implementation
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -657,7 +600,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => setEditingProfile(profile)}
+                          onClick={() => alert('Edit functionality coming soon')}
                           className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                         >
                           <Edit className="w-4 h-4 mr-1" />
@@ -754,7 +697,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setEditingAd(ad)}
+                        onClick={() => alert('Edit functionality coming soon')}
                         className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
                       >
                         <Edit className="w-4 h-4" />
@@ -946,14 +889,6 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
               </button>
             )
           })}
-        </div>
-                ? 'bg-accent text-black shadow-lg'
-                : 'text-muted-foreground hover:text-white hover:bg-card/50'
-            }`}
-          >
-            <Megaphone className="w-4 h-4 inline mr-2" />
-            Advertisements
-          </button>
         </div>
 
         {/* Modern Content Sections */}
