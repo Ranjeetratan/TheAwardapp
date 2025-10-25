@@ -9,9 +9,8 @@ import { ProfileForm } from './ProfileForm'
 import { ProfilePage } from './ProfilePage'
 import { FAQ } from './FAQ'
 import { Footer } from './Footer'
-import { supabase } from '../lib/supabase'
+import { profileCache, preloadProfiles } from '../App'
 import type { Profile } from '../lib/supabase'
-import { Loader2 } from 'lucide-react'
 
 export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -80,21 +79,18 @@ export function HomePage() {
   }, [])
 
   const fetchProfiles = async () => {
+    // Check if we have cached profiles first
+    if (profileCache.length > 0) {
+      setProfiles(profileCache)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('approved', true)
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Supabase error:', error)
-        setProfiles([])
-      } else {
-        setProfiles(data || [])
-      }
+      // Use the preload function which handles caching
+      const cachedProfiles = await preloadProfiles()
+      setProfiles(cachedProfiles)
     } catch (error) {
       console.error('Error fetching profiles:', error)
       setProfiles([])
@@ -394,10 +390,33 @@ export function HomePage() {
       <section className="px-6 lg:px-8 py-12">
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 animate-spin text-accent mb-4" />
-              <p className="text-gray-400">Loading profiles...</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {/* Skeleton Loading Cards */}
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="bg-card/30 backdrop-blur-sm rounded-2xl border border-accent/10 p-6 animate-pulse">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gray-700 rounded-xl"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-700 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 bg-gray-700 rounded"></div>
+                    <div className="h-3 bg-gray-700 rounded w-4/5"></div>
+                    <div className="h-3 bg-gray-700 rounded w-3/5"></div>
+                  </div>
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="h-6 bg-gray-700 rounded w-16"></div>
+                    <div className="h-8 bg-gray-700 rounded w-20"></div>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
           ) : filteredProfiles.length === 0 ? (
             <div className="text-center py-20">
               <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">

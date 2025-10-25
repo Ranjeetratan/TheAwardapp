@@ -5,12 +5,24 @@ import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
-import { Users, UserCheck, UserX, TrendingUp, Star, Plus, Edit, Trash2, Megaphone, LogOut, EyeOff } from 'lucide-react'
+import { 
+  Users, UserCheck, UserX, TrendingUp, Star, Plus, Edit, Trash2, Megaphone, LogOut, EyeOff, 
+  BarChart3, DollarSign, Building2, Briefcase, Search, Filter, MoreHorizontal, 
+  Calendar, Globe, Mail, Linkedin, ExternalLink, RefreshCw, Settings, Bell
+} from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { Profile, Advertisement } from '../lib/supabase'
 
 interface AdminPanelProps {
   onLogout: () => void
+}
+
+// Add this to window for debugging
+declare global {
+  interface Window {
+    testSupabaseConnection: () => Promise<void>
+    testProfileInsert: () => Promise<void>
+  }
 }
 
 export function AdminPanel({ onLogout }: AdminPanelProps) {
@@ -25,7 +37,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     investorsCount: 0
   })
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'founders' | 'cofounders' | 'investors' | 'ads'>('founders')
+  const [activeTab, setActiveTab] = useState<'overview' | 'founders' | 'cofounders' | 'investors' | 'ads'>('overview')
   const [editingAd, setEditingAd] = useState<Advertisement | null>(null)
   const [newAd, setNewAd] = useState({
     title: '',
@@ -39,11 +51,53 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   useEffect(() => {
     fetchProfiles()
     fetchAdvertisements()
+    
+    // Add debugging functions to window
+    window.testSupabaseConnection = async () => {
+      try {
+        console.log('Testing Supabase connection...')
+        const { data, error } = await supabase.from('profiles').select('count', { count: 'exact' })
+        console.log('Connection test result:', { data, error })
+        if (error) {
+          console.error('Connection failed:', error)
+        } else {
+          console.log('Connection successful! Profile count:', data)
+        }
+      } catch (err) {
+        console.error('Connection test error:', err)
+      }
+    }
+    
+    window.testProfileInsert = async () => {
+      try {
+        console.log('Testing profile insert...')
+        const testProfile = {
+          full_name: 'Test User',
+          email: 'test@example.com',
+          location: 'Test City',
+          linkedin_profile: 'https://linkedin.com/in/test',
+          short_bio: 'Test bio',
+          availability: 'Full-time',
+          looking_for: 'Test',
+          role: 'founder' as const,
+          approved: true,
+          featured: false
+        }
+        const { data, error } = await supabase.from('profiles').insert([testProfile]).select()
+        console.log('Insert test result:', { data, error })
+      } catch (err) {
+        console.error('Insert test error:', err)
+      }
+    }
   }, [])
 
   const fetchProfiles = async () => {
     setLoading(true)
     try {
+      console.log('Fetching profiles from Supabase...')
+      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
+      console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_KEY)
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -51,45 +105,12 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
       if (error) {
         console.error('Error fetching profiles:', error)
-        // Mock data for demo
-        const mockProfiles: Profile[] = [
-          {
-            id: '1',
-            full_name: 'John Doe',
-            email: 'john@example.com',
-            location: 'San Francisco, CA',
-            linkedin_profile: 'https://linkedin.com/in/johndoe',
-            short_bio: 'Experienced entrepreneur looking to build the next big thing in AI/ML.',
-            availability: 'Full-time',
-            looking_for: 'Technical Co-founder',
-            role: 'founder',
-            startup_name: 'AI Startup',
-            startup_stage: 'Seed',
-            industry: 'AI/ML',
-            approved: false,
-            featured: false,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            full_name: 'Jane Smith',
-            email: 'jane@example.com',
-            location: 'New York, NY',
-            linkedin_profile: 'https://linkedin.com/in/janesmith',
-            short_bio: 'Full-stack developer with 8 years of experience.',
-            availability: 'Part-time',
-            looking_for: 'Startup Opportunity',
-            role: 'cofounder',
-            skills_expertise: 'React, Node.js, Python',
-            experience_level: 'Expert',
-            approved: true,
-            featured: true,
-            created_at: new Date().toISOString()
-          }
-        ]
-        setProfiles(mockProfiles)
-        calculateStats(mockProfiles)
+        console.log('Supabase error details:', error)
+        alert(`Database error: ${error.message}. Please check your Supabase configuration.`)
+        setProfiles([])
+        calculateStats([])
       } else {
+        console.log('Successfully fetched profiles:', data?.length || 0, data)
         setProfiles(data || [])
         calculateStats(data || [])
       }
@@ -174,21 +195,33 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
 
   const handleReject = async (profileId: string | undefined) => {
     if (!profileId) return
+    if (!confirm('Are you sure you want to delete this profile? This action cannot be undone.')) {
+      return
+    }
+    
     try {
-      const { error } = await supabase
+      console.log('Attempting to delete profile with ID:', profileId)
+      const { data, error } = await supabase
         .from('profiles')
         .delete()
         .eq('id', profileId)
+        .select()
+
+      console.log('Delete response:', { data, error })
 
       if (error) {
-        console.error('Error rejecting profile:', error)
+        console.error('Error deleting profile:', error)
+        alert(`Error deleting profile: ${error.message}`)
       } else {
+        console.log('Profile deleted successfully')
         const updatedProfiles = profiles.filter(p => p.id !== profileId)
         setProfiles(updatedProfiles)
         calculateStats(updatedProfiles)
+        alert('Profile deleted successfully!')
       }
     } catch (error) {
-      console.error('Error:', error)
+      console.error('Network error:', error)
+      alert('Network error. Please try again.')
     }
   }
 
@@ -392,82 +425,528 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     }
   }
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+              <div className="space-y-3">
+                {profiles.slice(0, 5).map((profile) => (
+                  <div key={profile.id} className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-r from-accent to-accent/80 flex items-center justify-center">
+                      {profile.headshot_url ? (
+                        <img
+                          src={profile.headshot_url}
+                          alt={profile.full_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-xs font-bold text-black">
+                          {profile.full_name.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-white">{profile.full_name}</p>
+                      <p className="text-xs text-gray-400">{profile.role} • {profile.location}</p>
+                    </div>
+                    <Badge variant={profile.approved ? 'default' : 'destructive'} className="text-xs">
+                      {profile.approved ? 'Approved' : 'Pending'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+              <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setActiveTab('founders')}
+                  className="p-4 bg-purple-500/20 rounded-xl text-left hover:bg-purple-500/30 transition-colors"
+                >
+                  <TrendingUp className="w-6 h-6 text-purple-400 mb-2" />
+                  <p className="text-sm font-medium text-white">Manage Founders</p>
+                  <p className="text-xs text-gray-400">{stats.foundersCount} profiles</p>
+                </button>
+                <button
+                  onClick={() => setActiveTab('cofounders')}
+                  className="p-4 bg-green-500/20 rounded-xl text-left hover:bg-green-500/30 transition-colors"
+                >
+                  <Users className="w-6 h-6 text-green-400 mb-2" />
+                  <p className="text-sm font-medium text-white">Manage Co-founders</p>
+                  <p className="text-xs text-gray-400">{stats.cofoundersCount} profiles</p>
+                </button>
+                <button
+                  onClick={() => setActiveTab('investors')}
+                  className="p-4 bg-yellow-500/20 rounded-xl text-left hover:bg-yellow-500/30 transition-colors"
+                >
+                  <DollarSign className="w-6 h-6 text-yellow-400 mb-2" />
+                  <p className="text-sm font-medium text-white">Manage Investors</p>
+                  <p className="text-xs text-gray-400">{stats.investorsCount} profiles</p>
+                </button>
+                <button
+                  onClick={() => setActiveTab('ads')}
+                  className="p-4 bg-blue-500/20 rounded-xl text-left hover:bg-blue-500/30 transition-colors"
+                >
+                  <Megaphone className="w-6 h-6 text-blue-400 mb-2" />
+                  <p className="text-sm font-medium text-white">Manage Ads</p>
+                  <p className="text-xs text-gray-400">{advertisements.length} active</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'founders':
+      case 'cofounders':
+      case 'investors':
+        return renderProfileSection(activeTab)
+
+      case 'ads':
+        return renderAdvertisementSection()
+
+      default:
+        return null
+    }
+  }
+
+  const renderProfileSection = (role: string) => {
+    const filteredProfiles = profiles.filter(profile => profile.role === role.slice(0, -1)) // Remove 's' from end
+    const roleConfig = {
+      founders: { title: 'Founders', icon: TrendingUp, color: 'purple' },
+      cofounders: { title: 'Co-founders', icon: Users, color: 'green' },
+      investors: { title: 'Investors', icon: DollarSign, color: 'yellow' }
+    }[role] || { title: role, icon: Users, color: 'blue' }
+
+    return (
+      <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className={`w-10 h-10 bg-${roleConfig.color}-500/20 rounded-xl flex items-center justify-center`}>
+                <roleConfig.icon className={`w-5 h-5 text-${roleConfig.color}-400`} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">{roleConfig.title}</h2>
+                <p className="text-sm text-gray-400">{filteredProfiles.length} profiles</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search profiles..."
+                  className="pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-accent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          <div className="space-y-4">
+            {filteredProfiles.map((profile) => (
+              <motion.div
+                key={profile.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/5 rounded-xl p-4 border border-white/10 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4 flex-1">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-r from-accent to-accent/80 flex items-center justify-center">
+                      {profile.headshot_url ? (
+                        <img
+                          src={profile.headshot_url}
+                          alt={profile.full_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-bold text-black">
+                          {profile.full_name.charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-white">{profile.full_name}</h3>
+                        {profile.featured && (
+                          <Badge className="bg-accent/20 text-accent text-xs">
+                            <Star className="w-3 h-3 mr-1" />
+                            Featured
+                          </Badge>
+                        )}
+                        <Badge variant={profile.approved ? 'default' : 'destructive'} className="text-xs">
+                          {profile.approved ? 'Approved' : 'Pending'}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{profile.short_bio}</p>
+                      <div className="flex items-center space-x-4 text-xs text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <Globe className="w-3 h-3" />
+                          <span>{profile.location}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Mail className="w-3 h-3" />
+                          <span>{profile.email}</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <Linkedin className="w-3 h-3" />
+                          <span>LinkedIn</span>
+                        </span>
+                      </div>
+                      {role === 'founders' && profile.startup_name && (
+                        <div className="mt-2 p-2 bg-white/5 rounded-lg">
+                          <p className="text-xs text-gray-400">Startup: <span className="text-white">{profile.startup_name}</span></p>
+                          <p className="text-xs text-gray-400">Industry: <span className="text-white">{profile.industry}</span></p>
+                        </div>
+                      )}
+                      {role === 'investors' && profile.investment_range && (
+                        <div className="mt-2 p-2 bg-white/5 rounded-lg">
+                          <p className="text-xs text-gray-400">Range: <span className="text-white">{profile.investment_range}</span></p>
+                          <p className="text-xs text-gray-400">Focus: <span className="text-white">{profile.investment_focus}</span></p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    {!profile.approved ? (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(profile.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <UserCheck className="w-4 h-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(profile.id)}
+                        >
+                          <UserX className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleFeature(profile.id, profile.featured)}
+                          className={profile.featured ? 'bg-accent/20 text-accent border-accent/50' : 'border-white/20 text-white hover:bg-white/10'}
+                        >
+                          <Star className="w-4 h-4 mr-1" />
+                          {profile.featured ? 'Unfeature' : 'Feature'}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleHideProfile(profile.id)}
+                          className="border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10"
+                        >
+                          <EyeOff className="w-4 h-4 mr-1" />
+                          Hide
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingProfile(profile)}
+                          className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(profile.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const renderAdvertisementSection = () => {
+    return (
+      <div className="space-y-6">
+        {/* Create New Ad */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+          <h2 className="text-xl font-bold text-white mb-4">Create New Advertisement</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <Input
+              value={newAd.title}
+              onChange={(e) => setNewAd(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Advertisement title"
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+            />
+            <Input
+              value={newAd.cta_text}
+              onChange={(e) => setNewAd(prev => ({ ...prev, cta_text: e.target.value }))}
+              placeholder="Button text"
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+            />
+          </div>
+          <Textarea
+            value={newAd.description}
+            onChange={(e) => setNewAd(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Advertisement description"
+            className="bg-white/10 border-white/20 text-white placeholder-gray-400 mb-4"
+            rows={3}
+          />
+          <Input
+            value={newAd.cta_url}
+            onChange={(e) => setNewAd(prev => ({ ...prev, cta_url: e.target.value }))}
+            placeholder="https://example.com or mailto:contact@example.com"
+            className="bg-white/10 border-white/20 text-white placeholder-gray-400 mb-4"
+          />
+          <Button
+            onClick={handleCreateAd}
+            className="bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70"
+            disabled={!newAd.title || !newAd.description || !newAd.cta_text || !newAd.cta_url}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create Advertisement
+          </Button>
+        </div>
+
+        {/* Existing Ads */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10">
+          <div className="p-6 border-b border-white/10">
+            <h2 className="text-xl font-bold text-white">Manage Advertisements</h2>
+            <p className="text-sm text-gray-400">{advertisements.length} advertisements</p>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {advertisements.map((ad) => (
+                <div key={ad.id} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-white">{ad.title}</h3>
+                        <Badge variant={ad.is_active ? 'default' : 'secondary'}>
+                          {ad.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-300 mb-2">{ad.description}</p>
+                      <div className="flex items-center space-x-4 text-xs text-gray-400">
+                        <span>CTA: {ad.cta_text}</span>
+                        <span>URL: {ad.cta_url}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setEditingAd(ad)}
+                        className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleToggleAdStatus(ad.id, ad.is_active)}
+                        className={ad.is_active ? 'border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10' : 'border-green-500/50 text-green-400 hover:bg-green-500/10'}
+                      >
+                        {ad.is_active ? 'Deactivate' : 'Activate'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteAd(ad.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#0f0f0f] to-[#1a1a1a] text-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-accent"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-accent/30 border-t-accent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white">Loading dashboard...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0a] via-[#0f0f0f] to-[#1a1a1a] text-white">
-      {/* Header */}
-      <div className="border-b border-accent/20 bg-card/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Modern Header */}
+      <header className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                Manage profiles, monitor activity, and oversee platform operations
-              </p>
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-accent to-accent/80 rounded-xl flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">CofounderBase Admin</h1>
+                <p className="text-sm text-gray-400">Dashboard & Management</p>
+              </div>
             </div>
-            <Button
-              onClick={onLogout}
-              variant="outline"
-              className="border-red-500/50 text-red-400 hover:bg-red-500/10"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            
+            <div className="flex items-center space-x-3">
+              <Button
+                onClick={() => {
+                  fetchProfiles()
+                  fetchAdvertisements()
+                }}
+                variant="outline"
+                size="sm"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+              <Button
+                onClick={onLogout}
+                variant="outline"
+                size="sm"
+                className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
-        <div className="flex space-x-1 mb-8 bg-card/30 p-1 rounded-xl border border-accent/20 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('founders')}
-            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'founders'
-                ? 'bg-accent text-black shadow-lg'
-                : 'text-muted-foreground hover:text-white hover:bg-card/50'
-            }`}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
           >
-            <TrendingUp className="w-4 h-4 inline mr-2" />
-            Founders ({stats.foundersCount})
-          </button>
-          <button
-            onClick={() => setActiveTab('cofounders')}
-            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'cofounders'
-                ? 'bg-accent text-black shadow-lg'
-                : 'text-muted-foreground hover:text-white hover:bg-card/50'
-            }`}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Profiles</p>
+                <p className="text-3xl font-bold text-white">{stats.totalProfiles}</p>
+                <p className="text-xs text-green-400 mt-1">
+                  {stats.approvedProfiles} approved
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-blue-400" />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
           >
-            <Users className="w-4 h-4 inline mr-2" />
-            Co-founders ({stats.cofoundersCount})
-          </button>
-          <button
-            onClick={() => setActiveTab('investors')}
-            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'investors'
-                ? 'bg-accent text-black shadow-lg'
-                : 'text-muted-foreground hover:text-white hover:bg-card/50'
-            }`}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Founders</p>
+                <p className="text-3xl font-bold text-white">{stats.foundersCount}</p>
+                <p className="text-xs text-purple-400 mt-1">Building startups</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-purple-400" />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
           >
-            <svg className="w-4 h-4 inline mr-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Investors ({stats.investorsCount})
-          </button>
-          <button
-            onClick={() => setActiveTab('ads')}
-            className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 ${
-              activeTab === 'ads'
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Co-founders</p>
+                <p className="text-3xl font-bold text-white">{stats.cofoundersCount}</p>
+                <p className="text-xs text-green-400 mt-1">Ready to join</p>
+              </div>
+              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                <UserCheck className="w-6 h-6 text-green-400" />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Investors</p>
+                <p className="text-3xl font-bold text-white">{stats.investorsCount}</p>
+                <p className="text-xs text-yellow-400 mt-1">Active investors</p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-yellow-400" />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Modern Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {[
+            { id: 'overview', label: 'Overview', icon: BarChart3, count: stats.totalProfiles },
+            { id: 'founders', label: 'Founders', icon: TrendingUp, count: stats.foundersCount },
+            { id: 'cofounders', label: 'Co-founders', icon: Users, count: stats.cofoundersCount },
+            { id: 'investors', label: 'Investors', icon: DollarSign, count: stats.investorsCount },
+            { id: 'ads', label: 'Advertisements', icon: Megaphone, count: advertisements.length }
+          ].map((tab) => {
+            const Icon = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-accent text-black shadow-lg'
+                    : 'bg-white/5 text-gray-300 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.id ? 'bg-black/20' : 'bg-white/20'
+                }`}>
+                  {tab.count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
                 ? 'bg-accent text-black shadow-lg'
                 : 'text-muted-foreground hover:text-white hover:bg-card/50'
             }`}
@@ -477,679 +956,8 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Profiles</CardTitle>
-                <Users className="h-4 w-4 text-accent" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-accent">{stats.totalProfiles}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.approvedProfiles} approved, {stats.pendingProfiles} pending
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Founders</CardTitle>
-                <TrendingUp className="h-4 w-4 text-blue-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-400">{stats.foundersCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active startup founders
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Cofounders</CardTitle>
-                <UserCheck className="h-4 w-4 text-green-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-400">{stats.cofoundersCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  Available cofounders
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Content based on active tab */}
-        {(activeTab === 'founders' || activeTab === 'cofounders' || activeTab === 'investors') && (
-          <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-            <CardHeader>
-              <CardTitle className="text-xl">
-                {activeTab === 'founders' && 'Founder Management'}
-                {activeTab === 'cofounders' && 'Co-founder Management'}
-                {activeTab === 'investors' && 'Investor Management'}
-              </CardTitle>
-              <p className="text-muted-foreground">
-                {activeTab === 'founders' && 'Review and manage founder profiles'}
-                {activeTab === 'cofounders' && 'Review and manage co-founder profiles'}
-                {activeTab === 'investors' && 'Review and manage investor profiles'}
-              </p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {profiles.filter(profile => {
-                  if (activeTab === 'founders') return profile.role === 'founder'
-                  if (activeTab === 'cofounders') return profile.role === 'cofounder'
-                  if (activeTab === 'investors') return profile.role === 'investor'
-                  return false
-                }).map((profile) => (
-                  <motion.div
-                    key={profile.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center justify-between p-4 bg-background/50 rounded-lg border border-accent/10"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-semibold text-white">{profile.full_name}</h3>
-                        <Badge variant={profile.role === 'founder' ? 'default' : 'secondary'}>
-                          {profile.role}
-                        </Badge>
-                        {profile.featured && (
-                          <Badge className="bg-accent/20 text-accent">
-                            <Star className="w-3 h-3 mr-1" />
-                            Featured
-                          </Badge>
-                        )}
-                        <Badge variant={profile.approved ? 'default' : 'destructive'}>
-                          {profile.approved ? 'Approved' : 'Pending'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-1">{profile.email}</p>
-                      <p className="text-sm text-gray-300">{profile.short_bio}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {profile.location} • {profile.availability}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 flex-wrap gap-2">
-                      {!profile.approved ? (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(profile.id)}
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <UserCheck className="w-4 h-4 mr-1" />
-                            Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleReject(profile.id)}
-                          >
-                            <UserX className="w-4 h-4 mr-1" />
-                            Delete
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleFeature(profile.id, profile.featured)}
-                            className={profile.featured ? 'bg-accent/20 text-accent' : ''}
-                          >
-                            <Star className="w-4 h-4 mr-1" />
-                            {profile.featured ? 'Unfeature' : 'Feature'}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleHideProfile(profile.id)}
-                            className="text-yellow-400 hover:bg-yellow-400/10"
-                          >
-                            <EyeOff className="w-4 h-4 mr-1" />
-                            Hide
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setEditingProfile(profile)}
-                            className="text-blue-400 hover:bg-blue-400/10"
-                          >
-                            <Edit className="w-4 h-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleReject(profile.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Delete
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Enhanced Profile Edit Modal */}
-        {editingProfile && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
-            <Card className="w-full max-w-4xl bg-card/95 backdrop-blur-xl border-accent/20 shadow-2xl max-h-[90vh] overflow-y-auto">
-              <CardHeader>
-                <CardTitle className="text-xl text-white">Edit Profile: {editingProfile.full_name} ({editingProfile.role})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Basic Information */}
-                <div>
-                  <h3 className="text-lg font-semibold text-accent mb-4">Basic Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Full Name *</label>
-                      <Input
-                        value={editingProfile.full_name}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, full_name: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Email *</label>
-                      <Input
-                        value={editingProfile.email}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, email: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Location *</label>
-                      <Input
-                        value={editingProfile.location}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, location: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Availability *</label>
-                      <select
-                        value={editingProfile.availability}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, availability: e.target.value } : null)}
-                        className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                      >
-                        <option value="Full-time">Full-time</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Open to Discuss">Open to Discuss</option>
-                        <option value="Consulting">Consulting</option>
-                        <option value="Equity Only">Equity Only</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Timezone</label>
-                      <Input
-                        value={editingProfile.timezone || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, timezone: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-white mb-2">Looking For *</label>
-                      <Input
-                        value={editingProfile.looking_for}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, looking_for: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-white mb-2">LinkedIn Profile *</label>
-                    <Input
-                      value={editingProfile.linkedin_profile}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, linkedin_profile: e.target.value } : null)}
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-white mb-2">Website/Portfolio</label>
-                    <Input
-                      value={editingProfile.website_portfolio || ''}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, website_portfolio: e.target.value } : null)}
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-white mb-2">Headshot URL</label>
-                    <Input
-                      value={editingProfile.headshot_url || ''}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, headshot_url: e.target.value } : null)}
-                      placeholder="https://example.com/image.jpg"
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-white mb-2">Bio *</label>
-                    <Textarea
-                      value={editingProfile.short_bio}
-                      onChange={(e) => setEditingProfile(prev => prev ? { ...prev, short_bio: e.target.value } : null)}
-                      className="bg-background/50 border-accent/20"
-                      rows={4}
-                    />
-                  </div>
-                </div>
-
-                {/* Founder-specific fields */}
-                {editingProfile.role === 'founder' && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-accent mb-4">Startup Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Startup Name</label>
-                        <Input
-                          value={editingProfile.startup_name || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, startup_name: e.target.value } : null)}
-                          className="bg-background/50 border-accent/20"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Startup Stage</label>
-                        <select
-                          value={editingProfile.startup_stage || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, startup_stage: e.target.value } : null)}
-                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                        >
-                          <option value="">Select stage</option>
-                          <option value="Idea">Idea</option>
-                          <option value="MVP">MVP</option>
-                          <option value="Pre-Seed">Pre-Seed</option>
-                          <option value="Seed">Seed</option>
-                          <option value="Series A">Series A</option>
-                          <option value="Series B+">Series B+</option>
-                          <option value="Scaling">Scaling</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Industry</label>
-                        <Input
-                          value={editingProfile.industry || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, industry: e.target.value } : null)}
-                          className="bg-background/50 border-accent/20"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Company Size</label>
-                        <select
-                          value={editingProfile.company_size || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, company_size: e.target.value } : null)}
-                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                        >
-                          <option value="">Select size</option>
-                          <option value="Solo Founder">Solo Founder</option>
-                          <option value="2-3 People">2-3 People</option>
-                          <option value="4-10 People">4-10 People</option>
-                          <option value="11-50 People">11-50 People</option>
-                          <option value="50+ People">50+ People</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">What You're Building</label>
-                      <Textarea
-                        value={editingProfile.what_building || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, what_building: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Looking for Co-founder</label>
-                      <Textarea
-                        value={editingProfile.looking_for_cofounder || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, looking_for_cofounder: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Co-founder-specific fields */}
-                {editingProfile.role === 'cofounder' && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-accent mb-4">Skills & Experience</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Skills/Expertise</label>
-                        <Input
-                          value={editingProfile.skills_expertise || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, skills_expertise: e.target.value } : null)}
-                          className="bg-background/50 border-accent/20"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Experience Level</label>
-                        <select
-                          value={editingProfile.experience_level || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, experience_level: e.target.value } : null)}
-                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                        >
-                          <option value="">Select level</option>
-                          <option value="Beginner (0-2 years)">Beginner (0-2 years)</option>
-                          <option value="Intermediate (3-5 years)">Intermediate (3-5 years)</option>
-                          <option value="Senior (6-10 years)">Senior (6-10 years)</option>
-                          <option value="Expert (10+ years)">Expert (10+ years)</option>
-                          <option value="Serial Entrepreneur">Serial Entrepreneur</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Industry Interests</label>
-                      <Input
-                        value={editingProfile.industry_interests || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, industry_interests: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Past Projects</label>
-                      <Textarea
-                        value={editingProfile.past_projects || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, past_projects: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Why Join a Startup</label>
-                      <Textarea
-                        value={editingProfile.why_join_startup || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, why_join_startup: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Investor-specific fields */}
-                {editingProfile.role === 'investor' && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-accent mb-4">Investment Profile</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Investment Range</label>
-                        <select
-                          value={editingProfile.investment_range || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_range: e.target.value } : null)}
-                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                        >
-                          <option value="">Select range</option>
-                          <option value="$1K-$10K">$1K-$10K</option>
-                          <option value="$10K-$50K">$10K-$50K</option>
-                          <option value="$50K-$100K">$50K-$100K</option>
-                          <option value="$100K-$500K">$100K-$500K</option>
-                          <option value="$500K-$1M">$500K-$1M</option>
-                          <option value="$1M-$5M">$1M-$5M</option>
-                          <option value="$5M+">$5M+</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-white mb-2">Investment Stage</label>
-                        <select
-                          value={editingProfile.investment_stage || ''}
-                          onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_stage: e.target.value } : null)}
-                          className="flex h-10 w-full rounded-2xl border border-accent/20 bg-background/50 px-3 py-2 text-sm text-white"
-                        >
-                          <option value="">Select stage</option>
-                          <option value="Angel">Angel</option>
-                          <option value="Seed">Seed</option>
-                          <option value="Series A">Series A</option>
-                          <option value="Series B+">Series B+</option>
-                          <option value="Strategic">Strategic</option>
-                          <option value="Venture Debt">Venture Debt</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Investment Focus</label>
-                      <Input
-                        value={editingProfile.investment_focus || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_focus: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                      />
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Portfolio Companies</label>
-                      <Textarea
-                        value={editingProfile.portfolio_companies || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, portfolio_companies: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-white mb-2">Investment Criteria</label>
-                      <Textarea
-                        value={editingProfile.investment_criteria || ''}
-                        onChange={(e) => setEditingProfile(prev => prev ? { ...prev, investment_criteria: e.target.value } : null)}
-                        className="bg-background/50 border-accent/20"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex space-x-3 pt-6 border-t border-accent/20">
-                  <Button
-                    onClick={() => handleUpdateProfile(editingProfile)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    Save Changes
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingProfile(null)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {activeTab === 'ads' && (
-          <div className="space-y-6">
-            {/* Create New Advertisement */}
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-              <CardHeader>
-                <CardTitle className="text-xl">Create New Advertisement</CardTitle>
-                <p className="text-muted-foreground">Add a new advertisement to display in the directory</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-2">Title</label>
-                    <Input
-                      value={newAd.title}
-                      onChange={(e) => setNewAd(prev => ({ ...prev, title: e.target.value }))}
-                      placeholder="Advertisement title"
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-white mb-2">CTA Text</label>
-                    <Input
-                      value={newAd.cta_text}
-                      onChange={(e) => setNewAd(prev => ({ ...prev, cta_text: e.target.value }))}
-                      placeholder="Button text"
-                      className="bg-background/50 border-accent/20"
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-white mb-2">Description</label>
-                  <Textarea
-                    value={newAd.description}
-                    onChange={(e) => setNewAd(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Advertisement description"
-                    className="bg-background/50 border-accent/20"
-                    rows={3}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-white mb-2">CTA URL</label>
-                  <Input
-                    value={newAd.cta_url}
-                    onChange={(e) => setNewAd(prev => ({ ...prev, cta_url: e.target.value }))}
-                    placeholder="https://example.com or mailto:contact@example.com"
-                    className="bg-background/50 border-accent/20"
-                  />
-                </div>
-                <Button
-                  onClick={handleCreateAd}
-                  className="bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70"
-                  disabled={!newAd.title || !newAd.description || !newAd.cta_text || !newAd.cta_url}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Advertisement
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Existing Advertisements */}
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/20">
-              <CardHeader>
-                <CardTitle className="text-xl">Manage Advertisements</CardTitle>
-                <p className="text-muted-foreground">Edit and manage existing advertisements</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {advertisements.map((ad) => (
-                    <motion.div
-                      key={ad.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="p-4 bg-background/50 rounded-lg border border-accent/10"
-                    >
-                      {editingAd?.id === ad.id ? (
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input
-                              value={editingAd.title}
-                              onChange={(e) => setEditingAd(prev => prev ? { ...prev, title: e.target.value } : null)}
-                              placeholder="Title"
-                              className="bg-background/50 border-accent/20"
-                            />
-                            <Input
-                              value={editingAd.cta_text}
-                              onChange={(e) => setEditingAd(prev => prev ? { ...prev, cta_text: e.target.value } : null)}
-                              placeholder="CTA Text"
-                              className="bg-background/50 border-accent/20"
-                            />
-                          </div>
-                          <Textarea
-                            value={editingAd.description}
-                            onChange={(e) => setEditingAd(prev => prev ? { ...prev, description: e.target.value } : null)}
-                            placeholder="Description"
-                            className="bg-background/50 border-accent/20"
-                            rows={3}
-                          />
-                          <Input
-                            value={editingAd.cta_url}
-                            onChange={(e) => setEditingAd(prev => prev ? { ...prev, cta_url: e.target.value } : null)}
-                            placeholder="CTA URL"
-                            className="bg-background/50 border-accent/20"
-                          />
-                          <div className="flex space-x-2">
-                            <Button
-                              onClick={() => handleUpdateAd(editingAd)}
-                              className="bg-green-600 hover:bg-green-700"
-                            >
-                              Save Changes
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => setEditingAd(null)}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h3 className="font-semibold text-white">{ad.title}</h3>
-                              <Badge variant={ad.is_active ? 'default' : 'secondary'}>
-                                {ad.is_active ? 'Active' : 'Inactive'}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-gray-300 mb-2">{ad.description}</p>
-                            <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                              <span>CTA: {ad.cta_text}</span>
-                              <span>URL: {ad.cta_url}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setEditingAd(ad)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleToggleAdStatus(ad.id, ad.is_active)}
-                              className={ad.is_active ? 'text-yellow-400' : 'text-green-400'}
-                            >
-                              {ad.is_active ? 'Deactivate' : 'Activate'}
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteAd(ad.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {/* Modern Content Sections */}
+        {renderTabContent()}
       </div>
     </div>
   )
