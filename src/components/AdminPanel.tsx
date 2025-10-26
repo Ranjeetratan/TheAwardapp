@@ -12,6 +12,7 @@ import {
 import { supabase } from '../lib/supabase'
 import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
 import { testGoogleAnalytics } from '../lib/analytics'
+import { getAutoApprovalSetting, updateAutoApprovalSetting } from '../lib/settings'
 import type { Profile, Advertisement } from '../lib/supabase'
 
 interface AdminPanelProps {
@@ -43,6 +44,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   })
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'founders' | 'cofounders' | 'investors' | 'ads'>('overview')
+  const [autoApprovalEnabled, setAutoApprovalEnabled] = useState(true)
   // editingAd removed - not used in current implementation
   const [newAd, setNewAd] = useState({
     title: '',
@@ -56,6 +58,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
   useEffect(() => {
     fetchProfiles()
     fetchAdvertisements()
+    fetchAutoApprovalSetting()
     
     // Add debugging functions to window
     window.testSupabaseConnection = async () => {
@@ -250,7 +253,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             title: 'Looking to build your MVP?',
             description: '$1000 for the planning, Miro Board and the MVP. Get your startup idea validated and built by experts.',
             cta_text: 'Get Started',
-            cta_url: 'mailto:contact@cofounderbase.com?subject=MVP Development Inquiry',
+            cta_url: 'mailto:ranjit.kumar.ds@gmail.com?subject=MVP Development Inquiry',
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
@@ -281,6 +284,32 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
       cofoundersCount,
       investorsCount
     })
+  }
+
+  const fetchAutoApprovalSetting = async () => {
+    try {
+      const setting = await getAutoApprovalSetting()
+      setAutoApprovalEnabled(setting)
+    } catch (error) {
+      console.error('Error fetching auto-approval setting:', error)
+    }
+  }
+
+  const handleToggleAutoApproval = async () => {
+    try {
+      const newSetting = !autoApprovalEnabled
+      const success = await updateAutoApprovalSetting(newSetting)
+      
+      if (success) {
+        setAutoApprovalEnabled(newSetting)
+        alert(`Auto-approval ${newSetting ? 'enabled' : 'disabled'} successfully!`)
+      } else {
+        alert('Failed to update auto-approval setting')
+      }
+    } catch (error) {
+      console.error('Error toggling auto-approval:', error)
+      alert('Error updating auto-approval setting')
+    }
   }
 
   const handleApprove = async (profileId: string | undefined) => {
@@ -870,9 +899,30 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             
             <div className="flex items-center space-x-3">
               <Button
+                onClick={handleToggleAutoApproval}
+                variant="outline"
+                size="sm"
+                className={`border-white/20 text-white hover:bg-white/10 ${
+                  autoApprovalEnabled ? 'bg-green-500/20 border-green-500/50' : 'bg-red-500/20 border-red-500/50'
+                }`}
+              >
+                {autoApprovalEnabled ? (
+                  <>
+                    <UserCheck className="w-4 h-4 mr-2" />
+                    Auto-Approve: ON
+                  </>
+                ) : (
+                  <>
+                    <UserX className="w-4 h-4 mr-2" />
+                    Auto-Approve: OFF
+                  </>
+                )}
+              </Button>
+              <Button
                 onClick={() => {
                   fetchProfiles()
                   fetchAdvertisements()
+                  fetchAutoApprovalSetting()
                 }}
                 variant="outline"
                 size="sm"

@@ -6,9 +6,10 @@ interface HeroProps {
   searchQuery: string
   onSearchChange: (value: string) => void
   activeTab: 'founders' | 'cofounders' | 'investors'
+  onSubmitProfile: () => void
 }
 
-export function Hero({ searchQuery, onSearchChange, activeTab }: HeroProps) {
+export function Hero({ searchQuery, onSearchChange, activeTab, onSubmitProfile }: HeroProps) {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const roles = ['Founders', 'Cofounders', 'Investors']
   
@@ -78,15 +79,23 @@ export function Hero({ searchQuery, onSearchChange, activeTab }: HeroProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex justify-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => document.getElementById('directory')?.scrollIntoView({ behavior: 'smooth' })}
+            onClick={onSubmitProfile}
             className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
           >
-            Start Connecting
+            Get Started Today
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => document.getElementById('directory')?.scrollIntoView({ behavior: 'smooth' })}
+            className="px-8 py-4 border-2 border-accent/30 text-accent font-semibold rounded-2xl hover:bg-accent/10 transition-all duration-200 text-lg"
+          >
+            Browse Profiles
           </motion.button>
         </motion.div>
       </motion.div>

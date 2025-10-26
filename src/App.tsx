@@ -5,6 +5,7 @@ import { AdminPanel } from './components/AdminPanel'
 import { AdminLogin } from './components/AdminLogin'
 import { SupportButton } from './components/SupportButton'
 import { supabase } from './lib/supabase'
+import { getAutoApprovalSetting } from './lib/settings'
 import type { Profile } from './lib/supabase'
 
 // Global profile cache for better performance
@@ -20,14 +21,23 @@ const preloadProfiles = async () => {
   }
 
   try {
-    const { data, error } = await supabase
+    // Check if auto-approval is enabled
+    const autoApprovalEnabled = await getAutoApprovalSetting()
+    
+    let query = supabase
       .from('profiles')
       .select(`
         id, full_name, email, headshot_url, location, linkedin_profile, 
         short_bio, availability, looking_for, role, startup_name, 
         industry, skills_expertise, investment_range, approved, featured, created_at
       `)
-      .eq('approved', true)
+    
+    // If auto-approval is disabled, only show approved profiles
+    if (!autoApprovalEnabled) {
+      query = query.eq('approved', true)
+    }
+    
+    const { data, error } = await query
       .order('featured', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(50)
@@ -82,13 +92,20 @@ function App() {
       if (profileMatch) {
         const profileId = profileMatch[1]
         try {
-          // Fetch the specific profile
-          const { data, error } = await supabase
+          // Check if auto-approval is enabled
+          const autoApprovalEnabled = await getAutoApprovalSetting()
+          
+          let query = supabase
             .from('profiles')
             .select('*')
             .eq('id', profileId)
-            .eq('approved', true)
-            .single()
+          
+          // If auto-approval is disabled, only show approved profiles
+          if (!autoApprovalEnabled) {
+            query = query.eq('approved', true)
+          }
+          
+          const { data, error } = await query.single()
           
           if (!error && data) {
             setSelectedProfile(data)
@@ -138,12 +155,20 @@ function App() {
       if (profileMatch) {
         const profileId = profileMatch[1]
         try {
-          const { data, error } = await supabase
+          // Check if auto-approval is enabled
+          const autoApprovalEnabled = await getAutoApprovalSetting()
+          
+          let query = supabase
             .from('profiles')
             .select('*')
             .eq('id', profileId)
-            .eq('approved', true)
-            .single()
+          
+          // If auto-approval is disabled, only show approved profiles
+          if (!autoApprovalEnabled) {
+            query = query.eq('approved', true)
+          }
+          
+          const { data, error } = await query.single()
           
           if (!error && data) {
             setSelectedProfile(data)

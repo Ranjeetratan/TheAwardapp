@@ -57,7 +57,7 @@ CREATE TABLE advertisements (
 
 -- Insert sample advertisements
 INSERT INTO advertisements (title, description, image_url, cta_text, cta_url) VALUES 
-('Partner with CofounderBase', 'Looking to connect with top-tier founders and cofounders? Partner with us to reach the most ambitious entrepreneurs.', null, 'Partner Now', 'mailto:partnerships@cofounderbase.com'),
+('Partner with CofounderBase', 'Looking to connect with top-tier founders and cofounders? Partner with us to reach the most ambitious entrepreneurs.', null, 'Partner Now', 'mailto:ranjit.kumar.ds@gmail.com?subject=Partnership Inquiry'),
 ('Startup Resources', 'Access our curated collection of startup tools, templates, and resources to accelerate your journey.', null, 'Explore Resources', '#resources');
 
 -- Insert sample profiles to make the website live

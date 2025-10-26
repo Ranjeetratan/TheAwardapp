@@ -1,15 +1,21 @@
--- Approve all pending profiles
--- Run this in your Supabase SQL editor to make all profiles live
-
+-- Approve all existing profiles to make them visible on the homepage
 UPDATE profiles 
 SET approved = true 
-WHERE approved = false;
+WHERE approved = false OR approved IS NULL;
 
--- Check the results
+-- Verify the update
 SELECT 
+  id,
+  full_name,
   role,
+  approved,
+  created_at
+FROM profiles 
+ORDER BY created_at DESC;
+
+-- Count approved vs unapproved profiles
+SELECT 
   approved,
   COUNT(*) as count
 FROM profiles 
-GROUP BY role, approved 
-ORDER BY role, approved;
+GROUP BY approved;

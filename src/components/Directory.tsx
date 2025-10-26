@@ -100,7 +100,7 @@ export function Directory({ activeTab, searchQuery, filters, onViewFullProfile }
             title: 'Looking to build your MVP?',
             description: '$1000 for the planning, Miro Board and the MVP. Get your startup idea validated and built by experts.',
             cta_text: 'Get Started',
-            cta_url: 'mailto:contact@cofounderbase.com?subject=MVP Development Inquiry',
+            cta_url: 'mailto:ranjit.kumar.ds@gmail.com?subject=MVP Development Inquiry',
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()

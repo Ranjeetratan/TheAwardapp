@@ -28,6 +28,6 @@ VALUES (
   'Looking to build your MVP?',
   '$1000 for the planning, Miro Board and the MVP. Get your startup idea validated and built by experts.',
   'Get Started',
-  'mailto:contact@cofounderbase.com?subject=MVP Development Inquiry',
+  'mailto:ranjit.kumar.ds@gmail.com?subject=MVP Development Inquiry',
   true
 ) ON CONFLICT DO NOTHING;

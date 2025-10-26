@@ -24,6 +24,7 @@ export function HomePage() {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [showStickySearch, setShowStickySearch] = useState(true)
   const faqRef = useRef<HTMLDivElement>(null)
+  const whatsNextRef = useRef<HTMLDivElement>(null)
   const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'founder' | 'cofounder' | 'investor'>('all')
   const [filters, setFilters] = useState({
     location: [] as string[],
@@ -63,15 +64,15 @@ export function HomePage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Handle scroll to hide sticky search when FAQ is reached
+  // Handle scroll to hide sticky search when WhatsNext is reached
   useEffect(() => {
     const handleScroll = () => {
-      if (faqRef.current) {
-        const faqTop = faqRef.current.offsetTop
+      if (whatsNextRef.current) {
+        const whatsNextTop = whatsNextRef.current.offsetTop
         const scrollPosition = window.scrollY + window.innerHeight
         
-        // Hide sticky search when FAQ section is in view
-        setShowStickySearch(scrollPosition < faqTop + 200)
+        // Hide sticky search when WhatsNext section is in view (with smooth transition)
+        setShowStickySearch(scrollPosition < whatsNextTop + 300)
       }
     }
 
@@ -331,17 +332,53 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-4"
+              className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-8"
             >
               Connect with ambitious founders and talented co-founders who share your vision and complement your skills.
             </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSubmitProfile}
+                className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
+              >
+                Get Started Today
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => document.querySelector('[data-profiles-section]')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-4 border-2 border-accent/30 text-accent font-semibold rounded-2xl hover:bg-accent/10 transition-all duration-200 text-lg"
+              >
+                Browse Profiles
+              </motion.button>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Sticky Search and Filters */}
-      {showStickySearch && (
-        <div className="sticky top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
+      <motion.div 
+        className="sticky top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/10"
+        animate={{
+          opacity: showStickySearch ? 1 : 0,
+          y: showStickySearch ? 0 : -100,
+        }}
+        transition={{
+          duration: 0.6,
+          ease: [0.4, 0, 0.2, 1]
+        }}
+        style={{
+          pointerEvents: showStickySearch ? 'auto' : 'none'
+        }}
+      >
           <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -389,11 +426,10 @@ export function HomePage() {
               />
             </div>
           </div>
-        </div>
-      )}
+      </motion.div>
 
       {/* Profiles Grid */}
-      <section className="px-6 lg:px-8 py-12">
+      <section className="px-6 lg:px-8 py-12" data-profiles-section>
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <motion.div
@@ -473,7 +509,9 @@ export function HomePage() {
       </section>
 
       {/* What's Next Section */}
-      <WhatsNext />
+      <div ref={whatsNextRef}>
+        <WhatsNext />
+      </div>
 
       {/* FAQ Section */}
       <div ref={faqRef}>

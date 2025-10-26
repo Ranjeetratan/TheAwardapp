@@ -174,13 +174,13 @@ export function WhatsNext() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => window.open('https://www.linkedin.com/in/ranjeet-ratan-59a221203/', '_blank')}
+                onClick={() => window.open('mailto:ranjit.kumar.ds@gmail.com?subject=Feature Request - CofounderBase', '_blank')}
                 className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-lg hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
               >
                 Share Your Ideas
               </button>
               <button
-                onClick={() => window.open('https://www.linkedin.com/in/ranjeet-ratan-59a221203/', '_blank')}
+                onClick={() => window.open('https://www.linkedin.com/in/ranjit-kumar-ds/', '_blank')}
                 className="px-6 py-3 border border-accent/30 text-accent font-semibold rounded-lg hover:bg-accent/10 transition-all duration-200"
               >
                 Connect with Founder

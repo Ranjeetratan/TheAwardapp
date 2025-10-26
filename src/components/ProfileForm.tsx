@@ -7,6 +7,7 @@ import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { supabase, type Profile } from '../lib/supabase'
 import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
+import { getAutoApprovalSetting } from '../lib/settings'
 import { ChevronLeft, ChevronRight, Check, User, Briefcase, FileText, Eye } from 'lucide-react'
 
 interface ProfileFormProps {
@@ -18,6 +19,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
   const [role, setRole] = useState<'founder' | 'cofounder' | 'investor' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [wasAutoApproved, setWasAutoApproved] = useState(false)
   const [headshot, setHeadshot] = useState<File | null>(null)
   const [formData, setFormData] = useState({
     full_name: '',
@@ -149,6 +151,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
         }
       }
 
+      // Check auto-approval setting
+      const autoApprove = await getAutoApprovalSetting()
+
       const profileData: Omit<Profile, 'id' | 'created_at'> = {
         full_name: formData.full_name,
         email: formData.email,
@@ -161,7 +166,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
         timezone: formData.timezone || undefined,
         looking_for: formData.looking_for,
         role,
-        approved: true,
+        approved: autoApprove,
         featured: false,
         ...(role === 'founder' && {
           startup_name: formData.startup_name,
@@ -200,8 +205,8 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
 
       console.log('Profile submitted successfully:', data[0])
       
-      // Since profiles are auto-approved, send welcome email immediately
-      if (data[0]) {
+      // Send welcome email only if auto-approved
+      if (data[0] && autoApprove) {
         try {
           const emailSent = await sendProfileLiveEmail({
             first_name: getFirstName(formData.full_name),
@@ -221,6 +226,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
         }
       }
       
+      setWasAutoApproved(autoApprove)
       setIsSubmitted(true)
     } catch (error) {
       console.error('Error submitting profile:', error)
@@ -264,7 +270,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
                   transition={{ delay: 0.6 }}
                   className="text-muted-foreground text-base sm:text-lg mb-6"
                 >
-                  Your profile is now live and visible in the directory!
+                  {wasAutoApproved 
+                    ? "Your profile is now live and visible in the directory!"
+                    : "Your profile has been submitted and is pending approval. You'll receive an email once it's approved and live!"
+                  }
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
