@@ -228,6 +228,7 @@ export function HomePage() {
   })
 
   const handleSubmitProfile = () => {
+    console.log('Submit profile clicked')
     setShowForm(true)
   }
 
@@ -297,7 +298,7 @@ export function HomePage() {
       />
       
       {/* Hero Section */}
-      <section className="pt-16 pb-8 px-6 lg:px-8">
+      <section className="pt-12 pb-6 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -309,10 +310,10 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl sm:text-6xl md:text-7xl font-bold mb-6 text-white leading-tight"
+              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white leading-tight"
             >
               <div className="mb-4">Find Your Perfect</div>
-              <div className="h-20 sm:h-24 md:h-28 flex items-center justify-center overflow-hidden">
+              <div className="h-16 sm:h-18 md:h-20 flex items-center justify-center overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentRoleIndex}
@@ -404,7 +405,15 @@ export function HomePage() {
                 ].map((role) => (
                   <button
                     key={role.key}
-                    onClick={() => setActiveRoleFilter(role.key as any)}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setActiveRoleFilter(role.key as any)
+                      // Scroll to top of profiles section smoothly
+                      document.querySelector('[data-profiles-section]')?.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                      })
+                    }}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                       activeRoleFilter === role.key
                         ? 'bg-accent text-black shadow-lg'

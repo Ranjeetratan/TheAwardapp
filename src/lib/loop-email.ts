@@ -14,8 +14,10 @@ export const sendProfileLiveEmail = async (profileData: LoopEmailData): Promise<
   const LOOP_TRANSACTION_ID = import.meta.env.VITE_LOOP_TRANSACTION_ID
 
   if (!LOOP_API_KEY || !LOOP_TRANSACTION_ID) {
-    console.error('Loop email configuration missing')
-    return false
+    console.warn('Loop email configuration missing - emails will not be sent')
+    console.log('Profile data that would have been emailed:', profileData)
+    // Return true to not block the form submission
+    return true
   }
 
   try {

@@ -415,7 +415,7 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
                     $1000 for the planning, Miro Board and the MVP. Get your startup idea validated and built by experts.
                   </p>
                   <Button
-                    onClick={() => window.open('mailto:ranjit.kumar.ds@gmail.com?subject=MVP Development Inquiry', '_blank')}
+                    onClick={() => window.open('https://www.linkedin.com/in/ranjit-kumar-ds/', '_blank')}
                     className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white"
                   >
                     Get Started
