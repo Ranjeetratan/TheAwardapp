@@ -435,26 +435,20 @@ export function HomePage() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
             >
               {/* Skeleton Loading Cards */}
-              {Array.from({ length: 8 }).map((_, index) => (
-                <div key={index} className="bg-card/30 backdrop-blur-sm rounded-2xl border border-accent/10 p-6 animate-pulse">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-gray-700 rounded-xl"></div>
-                    <div className="flex-1">
-                      <div className="h-4 bg-gray-700 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div key={index} className="bg-card/30 backdrop-blur-sm rounded-2xl border border-accent/10 animate-pulse">
+                  <div className="aspect-[4/3] bg-gray-700 rounded-t-2xl mb-3"></div>
+                  <div className="p-3">
+                    <div className="h-3 bg-gray-700 rounded mb-2"></div>
+                    <div className="h-2 bg-gray-700 rounded w-3/4 mb-2"></div>
+                    <div className="h-2 bg-gray-700 rounded w-1/2 mb-2"></div>
+                    <div className="space-y-1">
+                      <div className="h-2 bg-gray-700 rounded"></div>
+                      <div className="h-2 bg-gray-700 rounded w-4/5"></div>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-gray-700 rounded"></div>
-                    <div className="h-3 bg-gray-700 rounded w-4/5"></div>
-                    <div className="h-3 bg-gray-700 rounded w-3/5"></div>
-                  </div>
-                  <div className="flex justify-between items-center mt-4">
-                    <div className="h-6 bg-gray-700 rounded w-16"></div>
-                    <div className="h-8 bg-gray-700 rounded w-20"></div>
                   </div>
                 </div>
               ))}
@@ -488,7 +482,7 @@ export function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4"
             >
               {filteredProfiles.map((profile, index) => (
                 <motion.div
@@ -517,6 +511,33 @@ export function HomePage() {
       <div ref={faqRef}>
         <FAQ activeTab="all" />
       </div>
+
+      {/* Call to Action Section */}
+      <section className="py-16 px-6 lg:px-8 bg-gradient-to-b from-transparent to-card/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Ready to find your cofounder?
+            </h2>
+            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Join thousands of founders, technical cofounders, and investors building the future.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSubmitProfile}
+              className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
+            >
+              Submit Your Profile
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Footer */}
       <Footer />
