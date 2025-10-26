@@ -11,7 +11,14 @@ import type { Profile } from './lib/supabase'
 // Global profile cache for better performance
 let profileCache: Profile[] = []
 let cacheTimestamp = 0
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+const CACHE_DURATION = 30 * 1000 // 30 seconds (reduced for immediate updates)
+
+// Function to clear cache (useful for debugging)
+const clearProfileCache = () => {
+  profileCache = []
+  cacheTimestamp = 0
+  console.log('Profile cache cleared')
+}
 
 // Preload profiles function
 const preloadProfiles = async () => {
@@ -54,7 +61,7 @@ const preloadProfiles = async () => {
 }
 
 // Export for use in HomePage
-export { profileCache, preloadProfiles }
+export { profileCache, preloadProfiles, clearProfileCache }
 
 function App() {
   const [showProfilePage, setShowProfilePage] = useState(false)
