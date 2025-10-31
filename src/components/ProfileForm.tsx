@@ -75,9 +75,21 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(formData.full_name && formData.email && formData.location && 
+        const step1Valid = !!(formData.full_name && formData.email && formData.location && 
                  formData.linkedin_profile && formData.short_bio && formData.availability && 
                  formData.looking_for)
+        if (!step1Valid) {
+          console.log('Step 1 validation failed. Missing fields:', {
+            full_name: !formData.full_name,
+            email: !formData.email,
+            location: !formData.location,
+            linkedin_profile: !formData.linkedin_profile,
+            short_bio: !formData.short_bio,
+            availability: !formData.availability,
+            looking_for: !formData.looking_for
+          })
+        }
+        return step1Valid
       case 2:
         return !!role
       case 3:
@@ -85,7 +97,20 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
           return !!(formData.startup_name && formData.startup_stage && formData.industry && 
                    formData.what_building && formData.looking_for_cofounder)
         } else if (role === 'cofounder') {
-          return !!(formData.skills_expertise && formData.experience_level && formData.why_join_startup)
+          const cofounderValid = !!(formData.skills_expertise && formData.experience_level && formData.why_join_startup)
+          if (!cofounderValid) {
+            console.log('Co-founder validation failed. Missing fields:', {
+              skills_expertise: !formData.skills_expertise,
+              experience_level: !formData.experience_level,
+              why_join_startup: !formData.why_join_startup
+            })
+            console.log('Current co-founder form data:', {
+              skills_expertise: formData.skills_expertise,
+              experience_level: formData.experience_level,
+              why_join_startup: formData.why_join_startup
+            })
+          }
+          return cofounderValid
         } else if (role === 'investor') {
           return !!(formData.investment_range && formData.investment_stage && formData.investment_focus && 
                    formData.investment_criteria)
@@ -192,6 +217,8 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
       }
 
       console.log('Submitting profile data:', profileData)
+      console.log('Role:', role)
+      console.log('Form validation passed for role:', role)
 
       const { data, error } = await supabase
         .from('profiles')
@@ -199,8 +226,20 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
         .select()
 
       if (error) {
-        console.error('Database error:', error)
-        throw new Error(`Database error: ${error.message}`)
+        console.error('Database error details:', error)
+        console.error('Error code:', error.code)
+        console.error('Error message:', error.message)
+        console.error('Error hint:', error.hint)
+        console.error('Error details:', error.details)
+        
+        // Provide more specific error messages
+        if (error.message.includes('constraint') || error.message.includes('check')) {
+          throw new Error(`Database constraint error: ${error.message}. This might be due to invalid field values. Please check your form inputs.`)
+        } else if (error.message.includes('duplicate') || error.message.includes('unique')) {
+          throw new Error(`A profile with this email already exists. Please use a different email address.`)
+        } else {
+          throw new Error(`Database error: ${error.message}`)
+        }
       }
 
       console.log('Profile submitted successfully:', data[0])
@@ -931,24 +970,45 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200 w-full sm:w-auto order-1 sm:order-2"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Submit Profile</span>
-                        <Check className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex space-x-2 w-full sm:w-auto order-1 sm:order-2">
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        console.log('=== FORM DEBUG INFO ===')
+                        console.log('Current role:', role)
+                        console.log('Current step:', currentStep)
+                        console.log('Step 3 validation:', validateStep(3))
+                        console.log('All form data:', formData)
+                        console.log('Required co-founder fields:', {
+                          skills_expertise: formData.skills_expertise,
+                          experience_level: formData.experience_level,
+                          why_join_startup: formData.why_join_startup
+                        })
+                      }}
+                      variant="outline"
+                      className="text-xs px-3 py-2"
+                    >
+                      Debug
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={isSubmitting}
+                      className="flex items-center justify-center space-x-2 bg-gradient-to-r from-accent to-accent/80 text-black hover:from-accent/90 hover:to-accent/70 transition-all duration-200 flex-1"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit Profile</span>
+                          <Check className="w-4 h-4" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 )}
               </div>
             </CardContent>

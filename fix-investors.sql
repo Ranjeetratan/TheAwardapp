@@ -1,4 +1,4 @@
--- Fix investment ranges to match database constraints
+Inst-- Fix investment ranges to match database constraints
 -- Valid values: '$1K-$10K', '$10K-$50K', '$50K-$100K', '$100K-$500K', '$500K-$1M', '$1M-$5M', '$5M+'
 
 INSERT INTO profiles (
