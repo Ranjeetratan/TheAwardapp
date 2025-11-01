@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useTheme } from '../lib/theme.tsx'
 import { Header } from './Header'
 import { SearchBar } from './SearchBar'
 import { HorizontalFilters } from './HorizontalFilters'
@@ -14,6 +15,8 @@ import { profileCache, preloadProfiles } from '../App'
 import type { Profile } from '../lib/supabase'
 
 export function HomePage() {
+  const { theme } = useTheme()
+  const prefersReducedMotion = useReducedMotion()
   const [searchQuery, setSearchQuery] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [profiles, setProfiles] = useState<Profile[]>([])
@@ -94,16 +97,22 @@ export function HomePage() {
       const cachedProfiles = await preloadProfiles()
       setProfiles(cachedProfiles)
     } catch (error) {
-      console.error('Error fetching profiles:', error)
+      console.error('Error fetching profiles:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
       setProfiles([])
     } finally {
       setLoading(false)
     }
   }
 
-  // Helper function to properly capitalize names and titles
+  // Helper function to properly capitalize names and titles with XSS protection
   const toTitleCase = (str: string) => {
-    return str.replace(/\w\S*/g, (txt) => 
+    if (!str || typeof str !== 'string') return ''
+    // Sanitize input to prevent XSS
+    const sanitized = str.replace(/[<>"'&]/g, '')
+    return sanitized.replace(/\w\S*/g, (txt) => 
       txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
     )
   }
@@ -291,7 +300,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className={`min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       <Header 
         onSubmitProfile={handleSubmitProfile} 
         onLogoClick={() => window.location.reload()}
@@ -310,7 +319,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4 text-white leading-tight"
+              className={`text-4xl sm:text-5xl md:text-6xl font-black mb-4 leading-[0.9] tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}
             >
               <div className="mb-4">Find Your Perfect</div>
               <div className="h-16 sm:h-18 md:h-20 flex items-center justify-center overflow-hidden">
@@ -333,9 +342,9 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-8"
+              className={`text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed mb-8 font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}
             >
-              Connect with ambitious founders and talented co-founders who share your vision and complement your skills.
+              Connect with indie hackers, solo developers, and makers building the next generation of SaaS products.
             </motion.p>
             
             <motion.div
@@ -345,18 +354,20 @@ export function HomePage() {
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
+                whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={handleSubmitProfile}
-                className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
+                className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 text-lg"
               >
                 Get Started Today
               </motion.button>
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
+                whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => document.querySelector('[data-profiles-section]')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-4 border-2 border-accent/30 text-accent font-semibold rounded-2xl hover:bg-accent/10 transition-all duration-200 text-lg"
+                className={`px-8 py-4 border-2 font-semibold rounded-xl transition-all duration-200 text-lg ${theme === 'dark' ? 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10' : 'border-emerald-600/30 text-emerald-600 hover:bg-emerald-50'}`}
               >
                 Browse Profiles
               </motion.button>
@@ -367,7 +378,7 @@ export function HomePage() {
 
       {/* Sticky Search and Filters */}
       <motion.div 
-        className="sticky top-20 z-40 bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/10"
+        className={`sticky top-20 z-40 backdrop-blur-xl border-b transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-950/95 border-slate-800' : 'bg-slate-50/95 border-slate-200'}`}
         animate={{
           opacity: showStickySearch ? 1 : 0,
           y: showStickySearch ? 0 : -100,
@@ -396,7 +407,7 @@ export function HomePage() {
             
             {/* Role Filter Buttons */}
             <div className="flex justify-center mb-4">
-              <div className="flex items-center space-x-2 bg-card/30 p-1 rounded-xl border border-accent/20">
+              <div className={`flex items-center space-x-2 p-1 rounded-xl border transition-colors ${theme === 'dark' ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'}`}>
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'founder', label: 'Founders' },
@@ -416,8 +427,8 @@ export function HomePage() {
                     }}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                       activeRoleFilter === role.key
-                        ? 'bg-accent text-black shadow-lg'
-                        : 'text-muted-foreground hover:text-white hover:bg-card/50'
+                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25'
+                        : theme === 'dark' ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                   >
                     {role.label}
@@ -472,8 +483,8 @@ export function HomePage() {
                   🔍
                 </motion.div>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">No profiles found</h3>
-              <p className="text-gray-400 mb-6">
+              <h3 className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>No profiles found</h3>
+              <p className={`mb-6 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
                 {searchQuery 
                   ? "Try adjusting your search to find more profiles."
                   : "Be the first to join our directory!"
@@ -481,7 +492,7 @@ export function HomePage() {
               </p>
               <button
                 onClick={handleSubmitProfile}
-                className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-lg hover:from-accent/90 hover:to-accent/70 transition-all duration-200"
+                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25"
               >
                 Submit Your Profile
               </button>
@@ -530,17 +541,18 @@ export function HomePage() {
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <h2 className={`text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
               Ready to find your cofounder?
             </h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Join thousands of founders, technical cofounders, and investors building the future.
+            <p className={`text-xl mb-8 max-w-2xl mx-auto leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+              Join indie hackers, solo developers, and makers building profitable SaaS products.
             </p>
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={!prefersReducedMotion ? { scale: 1.02, y: -2 } : {}}
+              whileTap={!prefersReducedMotion ? { scale: 0.98 } : {}}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
               onClick={handleSubmitProfile}
-              className="px-8 py-4 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25 text-lg"
+              className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 text-lg"
             >
               Submit Your Profile
             </motion.button>

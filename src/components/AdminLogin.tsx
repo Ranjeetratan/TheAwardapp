@@ -17,18 +17,36 @@ export function AdminLogin({ onLogin }: AdminLoginProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!password.trim()) return
+    
     setIsLoading(true)
     
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    onLogin(password)
-    setIsLoading(false)
+    try {
+      // Simulate loading delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500))
+      onLogin(password)
+    } catch (error) {
+      console.error('Login error:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleBackToHome = () => {
-    window.history.pushState({}, '', '/')
-    window.location.reload()
+    try {
+      window.history.pushState({}, '', '/')
+      window.location.reload()
+    } catch (error) {
+      console.error('Navigation error:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
+      // Fallback navigation
+      window.location.href = '/'
+    }
   }
 
   return (

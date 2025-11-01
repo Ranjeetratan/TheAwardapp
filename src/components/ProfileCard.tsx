@@ -1,8 +1,9 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Card, CardContent } from './ui/card'
 import { Badge } from './ui/badge'
 import { MapPin, Briefcase, User, Star } from 'lucide-react'
 import type { Profile } from '../lib/supabase'
+import { useTheme } from '../lib/theme.tsx'
 
 interface ProfileCardProps {
   profile: Profile
@@ -10,14 +11,17 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard({ profile, onClick }: ProfileCardProps) {
+  const { theme } = useTheme()
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <motion.div
-      whileHover={{ y: -2, scale: 1.02 }}
-      transition={{ duration: 0.2 }}
+      whileHover={!prefersReducedMotion ? { y: -4, scale: 1.02 } : {}}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="cursor-pointer"
       onClick={onClick}
     >
-      <Card className="bg-white/5 border-white/10 hover:border-accent/40 transition-all duration-300 group overflow-hidden">
+      <Card className={`transition-all duration-300 group overflow-hidden ${theme === 'dark' ? 'bg-slate-900/50 border-slate-800 hover:border-emerald-500/30 hover:bg-slate-800/50' : 'bg-white border-slate-200 hover:border-emerald-500/30 hover:shadow-lg'}`}>
         <CardContent className="p-0">
           {/* Profile Image */}
           <div className="relative aspect-[4/3]">
@@ -28,7 +32,7 @@ export function ProfileCard({ profile, onClick }: ProfileCardProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center">
+              <div className={`w-full h-full bg-gradient-to-br flex items-center justify-center border-2 border-dashed ${theme === 'dark' ? 'from-emerald-500/10 via-emerald-500/5 to-transparent border-emerald-500/20' : 'from-emerald-500/5 via-emerald-500/3 to-transparent border-emerald-500/15'}`}>
                 {profile.role === 'founder' ? (
                   <Briefcase className="w-8 h-8 text-accent" />
                 ) : (
@@ -59,22 +63,22 @@ export function ProfileCard({ profile, onClick }: ProfileCardProps) {
 
           {/* Profile Info */}
           <div className="p-3">
-            <h3 className="font-semibold text-white mb-1 group-hover:text-accent transition-colors duration-300 truncate text-sm">
+            <h3 className={`font-bold mb-1 transition-colors duration-300 truncate text-sm tracking-tight ${theme === 'dark' ? 'text-white group-hover:text-emerald-400' : 'text-slate-900 group-hover:text-emerald-600'}`}>
               {profile.full_name}
             </h3>
             
-            <div className="flex items-center text-xs text-gray-400 mb-2">
+            <div className={`flex items-center text-xs mb-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
               <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
               <span className="truncate">{profile.location}</span>
             </div>
 
             {/* Role-specific info */}
             {profile.role === 'founder' && profile.startup_name && (
-              <p className="text-xs text-accent font-medium mb-1 truncate">{profile.startup_name}</p>
+              <p className={`text-xs font-medium mb-1 truncate ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>{profile.startup_name}</p>
             )}
 
             {profile.role === 'cofounder' && profile.skills_expertise && (
-              <p className="text-xs text-gray-400 mb-1 truncate">
+              <p className={`text-xs mb-1 truncate ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
                 {profile.skills_expertise.split(',')[0].trim()}
                 {profile.skills_expertise.split(',').length > 1 && '...'}
               </p>
@@ -83,10 +87,10 @@ export function ProfileCard({ profile, onClick }: ProfileCardProps) {
             {profile.role === 'investor' && (
               <div className="mb-1">
                 {profile.investment_range && (
-                  <p className="text-xs text-accent font-medium truncate">{profile.investment_range}</p>
+                  <p className={`text-xs font-medium truncate ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>{profile.investment_range}</p>
                 )}
                 {profile.portfolio_companies && (
-                  <p className="text-xs text-gray-400 truncate">
+                  <p className={`text-xs truncate ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
                     {profile.portfolio_companies.split(',')[0].trim()}
                     {profile.portfolio_companies.split(',').length > 1 && '...'}
                   </p>
@@ -95,7 +99,7 @@ export function ProfileCard({ profile, onClick }: ProfileCardProps) {
             )}
 
             {/* Bio */}
-            <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+            <p className={`text-xs line-clamp-2 leading-relaxed ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
               {profile.short_bio}
             </p>
           </div>

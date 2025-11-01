@@ -15,7 +15,6 @@ export const sendProfileLiveEmail = async (profileData: LoopEmailData): Promise<
 
   if (!LOOP_API_KEY || !LOOP_TRANSACTION_ID) {
     console.warn('Loop email configuration missing - emails will not be sent')
-    console.log('Profile data that would have been emailed:', profileData)
     // Return true to not block the form submission
     return true
   }
@@ -40,17 +39,24 @@ export const sendProfileLiveEmail = async (profileData: LoopEmailData): Promise<
     })
 
     if (!response.ok) {
-      const errorData = await response.text()
-      console.error('Loop email error:', errorData)
+      const errorText = await response.text()
+      console.error('Loop email API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        timestamp: new Date().toISOString()
+      })
       return false
     }
 
     const result = await response.json()
-    console.log('Profile live email sent successfully:', result)
+    console.log('Profile live email sent successfully')
     return true
 
   } catch (error) {
-    console.error('Error sending profile live email:', error)
+    console.error('Error sending profile live email:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    })
     return false
   }
 }

@@ -33,10 +33,13 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
     }
   }, [isOpen, profile])
 
-  // Helper function to properly capitalize names and titles
+  // Helper function to properly capitalize names and titles with XSS protection
   const toTitleCase = (str: string) => {
-    return str.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    if (!str || typeof str !== 'string') return ''
+    // Sanitize input to prevent XSS
+    const sanitized = str.replace(/[<>"'&]/g, '')
+    return sanitized.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
     )
   }
 
@@ -146,7 +149,13 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
                             size="sm"
                             onClick={() => {
                               trackContactClick('linkedin', profile.role)
-                              window.open(profile.linkedin_profile, '_blank')
+                              // Validate LinkedIn URL before opening
+                              const linkedinUrl = profile.linkedin_profile
+                              if (linkedinUrl && (linkedinUrl.startsWith('https://linkedin.com/') || linkedinUrl.startsWith('https://www.linkedin.com/'))) {
+                                window.open(linkedinUrl, '_blank', 'noopener,noreferrer')
+                              } else {
+                                console.warn('Invalid LinkedIn URL')
+                              }
                             }}
                             className="bg-[#0077B5] hover:bg-[#005885] text-white flex items-center gap-1"
                           >
@@ -190,7 +199,14 @@ export function ProfileModal({ profile, isOpen, onClose, onViewFullProfile }: Pr
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => window.open(profile.website_portfolio!, '_blank')}
+                              onClick={() => {
+                                const websiteUrl = profile.website_portfolio
+                                if (websiteUrl && (websiteUrl.startsWith('https://') || websiteUrl.startsWith('http://'))) {
+                                  window.open(websiteUrl, '_blank', 'noopener,noreferrer')
+                                } else {
+                                  console.warn('Invalid website URL')
+                                }
+                              }}
                               className="border-accent/30 text-accent hover:bg-accent/10"
                             >
                               <Globe className="w-4 h-4 mr-1" />

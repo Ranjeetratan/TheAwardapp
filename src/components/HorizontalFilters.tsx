@@ -35,22 +35,25 @@ export function HorizontalFilters({ activeTab, filters, onFilterChange, onClearF
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    if (openDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [openDropdown])
 
+  // Memoize filter options to prevent unnecessary re-renders
   const filterOptions = {
-    location: ['San Francisco', 'New York', 'London', 'Berlin', 'Remote', 'Los Angeles', 'Austin', 'Seattle', 'Toronto', 'Amsterdam', 'Boston', 'Chicago', 'Miami', 'Denver', 'Portland'],
-    industry: ['FinTech', 'HealthTech', 'EdTech', 'E-commerce', 'AI/ML', 'SaaS', 'Gaming', 'Climate Tech', 'Crypto/Web3', 'DeepTech', 'Marketplace', 'Social Media', 'Enterprise Software', 'Consumer Apps', 'Hardware'],
-    availability: ['Full-time', 'Part-time', 'Open to Discuss', 'Consulting', 'Equity Only', 'Sweat Equity', 'Paid Role'],
-    stage: ['Idea', 'MVP', 'Pre-Seed', 'Seed', 'Series A', 'Series B+', 'Scaling', 'Product-Market Fit'],
-    experience: ['Beginner (0-2 years)', 'Intermediate (3-5 years)', 'Senior (6-10 years)', 'Expert (10+ years)', 'Serial Entrepreneur'],
-    investmentRange: ['$1K-$10K', '$10K-$50K', '$50K-$100K', '$100K-$500K', '$500K-$1M', '$1M-$5M', '$5M+'],
-    investmentType: ['Angel', 'Seed', 'Series A', 'Series B+', 'Strategic', 'Venture Debt', 'Syndicate', 'Family Office'],
-    skills: ['React', 'Node.js', 'Python', 'JavaScript', 'TypeScript', 'Mobile Development', 'iOS', 'Android', 'Flutter', 'React Native', 'No-Code', 'Bubble', 'Webflow', 'Figma', 'UI/UX Design', 'Product Management', 'DevOps', 'AWS', 'Machine Learning', 'Data Science', 'Blockchain', 'Solidity', 'Go', 'Rust', 'Java', 'C++', 'PHP', 'Ruby', 'Vue.js', 'Angular', 'Next.js', 'Django', 'Flask', 'Express.js'],
-    lookingFor: ['Technical Cofounder', 'Business Cofounder', 'CTO', 'VP Engineering', 'Lead Developer', 'Product Manager', 'Designer', 'Marketing Partner', 'Sales Partner', 'Operations Partner'],
+    location: ['San Francisco', 'New York', 'London', 'Berlin', 'Remote', 'Los Angeles', 'Austin', 'Seattle', 'Toronto', 'Amsterdam'],
+    industry: ['FinTech', 'HealthTech', 'EdTech', 'E-commerce', 'AI/ML', 'SaaS', 'Gaming', 'Climate Tech', 'Crypto/Web3', 'DeepTech'],
+    availability: ['Full-time', 'Part-time', 'Open to Discuss', 'Consulting', 'Equity Only'],
+    stage: ['Idea', 'MVP', 'Pre-Seed', 'Seed', 'Series A', 'Series B+', 'Scaling'],
+    experience: ['Beginner', 'Intermediate', 'Senior', 'Expert'],
+    investmentRange: ['$1K-$10K', '$10K-$50K', '$50K-$100K', '$100K-$500K', '$500K-$1M', '$1M+'],
+    investmentType: ['Angel', 'Seed', 'Series A', 'Series B+', 'Strategic', 'Venture Debt'],
+    skills: ['React', 'Node.js', 'Python', 'JavaScript', 'TypeScript', 'Mobile Development', 'UI/UX Design', 'Product Management', 'DevOps', 'Machine Learning'],
+    lookingFor: ['Technical Cofounder', 'Business Cofounder', 'CTO', 'VP Engineering', 'Product Manager', 'Designer'],
     companySize: ['Solo Founder', '2-3 People', '4-10 People', '11-50 People', '50+ People'],
-    fundingStage: ['Bootstrapped', 'Pre-Revenue', 'Revenue Generating', 'Profitable', 'Seeking Investment', 'Recently Funded']
+    fundingStage: ['Bootstrapped', 'Pre-Revenue', 'Revenue Generating', 'Profitable', 'Seeking Investment']
   }
 
   const getRelevantFilters = () => {

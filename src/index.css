@@ -5,26 +5,48 @@
 
 @layer base {
   :root {
-    --background: 210 40% 4%;
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 13% 91%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 160 84% 39%;
+    --radius: 0.75rem;
+  }
+
+  [data-theme="dark"] {
+    --background: 222 47% 4%;
     --foreground: 210 40% 98%;
-    --card: 210 40% 6%;
+    --card: 222 47% 7%;
     --card-foreground: 210 40% 98%;
-    --popover: 210 40% 6%;
+    --popover: 222 47% 7%;
     --popover-foreground: 210 40% 98%;
-    --primary: 73 100% 64%;
-    --primary-foreground: 210 40% 4%;
-    --secondary: 210 40% 10%;
+    --primary: 160 84% 45%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 210 40% 10%;
-    --muted-foreground: 210 40% 65%;
-    --accent: 73 100% 64%;
-    --accent-foreground: 210 40% 4%;
-    --destructive: 0 62.8% 30.6%;
+    --muted: 215 20% 20%;
+    --muted-foreground: 217 20% 60%;
+    --accent: 160 84% 45%;
+    --accent-foreground: 222 47% 4%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 40% 18%;
-    --input: 210 40% 18%;
-    --ring: 73 100% 64%;
-    --radius: 1rem;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 160 84% 45%;
   }
 }
 
@@ -35,7 +57,17 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
   }
 }
 

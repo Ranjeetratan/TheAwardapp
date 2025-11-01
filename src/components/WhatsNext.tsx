@@ -4,8 +4,10 @@ import {
   Users, MessageCircle, Calendar, Search, Shield, Zap, 
   CheckCircle, Clock, ArrowRight, Sparkles
 } from 'lucide-react'
+import { useTheme } from '../lib/theme.tsx'
 
 export function WhatsNext() {
+  const { theme } = useTheme()
   const roadmapItems = [
     {
       title: "User Login & Profiles",
@@ -93,10 +95,10 @@ export function WhatsNext() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          <h2 className={`text-4xl sm:text-5xl font-bold mb-6 ${theme === 'dark' ? 'bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent' : 'text-slate-900'}`}>
             What's Next?
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className={`text-xl max-w-3xl mx-auto leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
             We're constantly evolving to make finding your perfect co-founder even easier. 
             Here's what we're building next to revolutionize how founders connect and collaborate.
           </p>
@@ -127,11 +129,11 @@ export function WhatsNext() {
                       </div>
                     </div>
                     
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-accent transition-colors duration-300">
+                    <h3 className={`text-xl font-bold mb-2 group-hover:text-accent transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                       {item.title}
                     </h3>
                     
-                    <p className="text-gray-400 mb-4 leading-relaxed">
+                    <p className={`mb-4 leading-relaxed ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
                       {item.description}
                     </p>
                     
@@ -143,7 +145,7 @@ export function WhatsNext() {
                       
                       <div className="space-y-2">
                         {item.features.map((feature, featureIndex) => (
-                          <div key={featureIndex} className="flex items-center space-x-2 text-sm text-gray-300">
+                          <div key={featureIndex} className={`flex items-center space-x-2 text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-slate-600'}`}>
                             <ArrowRight className="w-3 h-3 text-accent" />
                             <span>{feature}</span>
                           </div>
@@ -165,10 +167,10 @@ export function WhatsNext() {
           className="text-center mt-12"
         >
           <div className="bg-card/30 backdrop-blur-sm rounded-2xl p-8 border border-accent/20">
-            <h3 className="text-2xl font-bold text-white mb-4">
+            <h3 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
               Have Ideas or Feedback?
             </h3>
-            <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+            <p className={`mb-6 max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
               We're building this platform for you! Share your thoughts, suggestions, or feature requests 
               to help us create the best co-founder matching experience.
             </p>

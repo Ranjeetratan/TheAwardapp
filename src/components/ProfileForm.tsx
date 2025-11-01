@@ -5,6 +5,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
+import { useTheme } from '../lib/theme.tsx'
 import { supabase, type Profile } from '../lib/supabase'
 import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
 import { getAutoApprovalSetting } from '../lib/settings'
@@ -15,6 +16,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
+  const { theme } = useTheme()
   const [currentStep, setCurrentStep] = useState(1)
   const [role, setRole] = useState<'founder' | 'cofounder' | 'investor' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -31,6 +33,12 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
     availability: '',
     timezone: '',
     looking_for: '',
+    
+    // Indie hacker fields
+    twitter_handle: '',
+    github_profile: '',
+    tech_stack: '',
+    monthly_revenue: '',
     
     // Founder fields
     startup_name: '',
@@ -150,7 +158,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
 
       return publicUrl
     } catch (error) {
-      console.error('Error uploading headshot:', error)
+      console.error('Error uploading headshot:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
       return null
     }
   }
@@ -171,7 +182,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
             console.warn('Headshot upload failed, continuing without headshot')
           }
         } catch (uploadError) {
-          console.warn('Headshot upload error, continuing without headshot:', uploadError)
+          console.warn('Headshot upload error, continuing without headshot:', {
+            message: uploadError instanceof Error ? uploadError.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+          })
           // Continue without headshot rather than failing the entire submission
         }
       }
@@ -268,7 +282,10 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
       setWasAutoApproved(autoApprove)
       setIsSubmitted(true)
     } catch (error) {
-      console.error('Error submitting profile:', error)
+      console.error('Error submitting profile:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
       alert(`There was an error submitting your profile: ${errorMessage}. Please try again.`)
     } finally {
@@ -422,16 +439,52 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="website_portfolio">Website / Portfolio</Label>
-              <Input
-                id="website_portfolio"
-                type="url"
-                value={formData.website_portfolio}
-                onChange={(e) => handleInputChange('website_portfolio', e.target.value)}
-                placeholder="https://yourwebsite.com"
-                className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="website_portfolio">Website / Portfolio</Label>
+                <Input
+                  id="website_portfolio"
+                  type="url"
+                  value={formData.website_portfolio}
+                  onChange={(e) => handleInputChange('website_portfolio', e.target.value)}
+                  placeholder="https://yourwebsite.com"
+                  className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="twitter_handle">Twitter / X Handle</Label>
+                <Input
+                  id="twitter_handle"
+                  value={formData.twitter_handle}
+                  onChange={(e) => handleInputChange('twitter_handle', e.target.value)}
+                  placeholder="@yourhandle"
+                  className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="github_profile">GitHub Profile</Label>
+                <Input
+                  id="github_profile"
+                  type="url"
+                  value={formData.github_profile}
+                  onChange={(e) => handleInputChange('github_profile', e.target.value)}
+                  placeholder="https://github.com/username"
+                  className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tech_stack">Tech Stack</Label>
+                <Input
+                  id="tech_stack"
+                  value={formData.tech_stack}
+                  onChange={(e) => handleInputChange('tech_stack', e.target.value)}
+                  placeholder="React, Node.js, PostgreSQL"
+                  className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -585,7 +638,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
                   />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="startup_stage">Startup Stage *</Label>
                     <select
@@ -608,9 +661,26 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
                       id="industry"
                       value={formData.industry}
                       onChange={(e) => handleInputChange('industry', e.target.value)}
-                      placeholder="FinTech, HealthTech, etc."
+                      placeholder="SaaS, AI/ML, etc."
                       className="transition-all duration-200 hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="monthly_revenue">MRR (Optional)</Label>
+                    <select
+                      id="monthly_revenue"
+                      value={formData.monthly_revenue}
+                      onChange={(e) => handleInputChange('monthly_revenue', e.target.value)}
+                      className="flex h-10 w-full rounded-2xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 hover:border-accent/50 focus-visible:ring-accent focus-visible:ring-offset-2 focus:border-accent transition-all duration-200"
+                    >
+                      <option value="">Select MRR</option>
+                      <option value="Pre-revenue">Pre-revenue</option>
+                      <option value="$0-$1K">$0-$1K</option>
+                      <option value="$1K-$5K">$1K-$5K</option>
+                      <option value="$5K-$10K">$5K-$10K</option>
+                      <option value="$10K-$50K">$10K-$50K</option>
+                      <option value="$50K+">$50K+</option>
+                    </select>
                   </div>
                 </div>
 
@@ -877,7 +947,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
   }
 
   return (
-    <section id="join-form" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8">
+    <section id="join-form" className={`py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${theme === 'dark' ? 'bg-slate-950' : 'bg-slate-50'}`}>
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -885,9 +955,9 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <Card className="bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl border border-accent/20 shadow-2xl hover:shadow-accent/20 hover:border-accent/40 transition-all duration-300">
+          <Card className={`backdrop-blur-xl border shadow-2xl transition-all duration-300 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
             <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="text-2xl sm:text-3xl font-bold text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <CardTitle className={`text-2xl sm:text-3xl font-bold text-center ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                 Join the Base
               </CardTitle>
               

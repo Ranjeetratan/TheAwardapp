@@ -28,7 +28,9 @@ const testEmailFunctionality = async () => {
       headers: {
         'Authorization': `Bearer ${loopApiKey}`,
         'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
       },
+      credentials: 'same-origin',
       body: JSON.stringify({
         transactionalId: loopTransactionId,
         email: 'test@example.com', // This won't actually send

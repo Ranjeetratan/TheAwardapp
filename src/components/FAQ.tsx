@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
+import { useTheme } from '../lib/theme.tsx'
 
 interface FAQProps {
   activeTab: 'founders' | 'cofounders' | 'investors' | 'all'
 }
 
 export function FAQ({ activeTab }: FAQProps) {
+  const { theme } = useTheme()
   const [openItems, setOpenItems] = useState<number[]>([0])
 
   const toggleItem = (index: number) => {
@@ -132,10 +134,10 @@ export function FAQ({ activeTab }: FAQProps) {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+          <h2 className={`text-3xl sm:text-4xl font-bold mb-4 ${theme === 'dark' ? 'bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent' : 'text-slate-900'}`}>
             Frequently Asked Questions
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className={`max-w-2xl mx-auto ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
             Everything you need to know about finding cofounders, technical partners, and investors.
           </p>
         </motion.div>
@@ -153,7 +155,7 @@ export function FAQ({ activeTab }: FAQProps) {
                 onClick={() => toggleItem(index)}
                 className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-accent/5 transition-colors"
               >
-                <h3 className="text-lg font-semibold text-white pr-4">
+                <h3 className={`text-lg font-semibold pr-4 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                   {faq.question}
                 </h3>
                 <ChevronDown 
@@ -172,7 +174,7 @@ export function FAQ({ activeTab }: FAQProps) {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="overflow-hidden"
                   >
-                    <div className="px-6 pb-4 text-gray-300 leading-relaxed">
+                    <div className={`px-6 pb-4 leading-relaxed ${theme === 'dark' ? 'text-gray-300' : 'text-slate-600'}`}>
                       {faq.answer}
                     </div>
                   </motion.div>
@@ -183,22 +185,7 @@ export function FAQ({ activeTab }: FAQProps) {
         </div>
 
         {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-center mt-12 p-8 bg-gradient-to-r from-accent/10 to-accent/5 rounded-2xl border border-accent/20"
-        >
-          <h3 className="text-xl font-semibold text-white mb-2">
-            Ready to find your cofounder?
-          </h3>
-          <p className="text-muted-foreground mb-6">
-            Join thousands of founders, technical cofounders, and investors building the future.
-          </p>
-          <button className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25">
-            Get Started Today
-          </button>
-        </motion.div>
+
       </div>
     </section>
   )

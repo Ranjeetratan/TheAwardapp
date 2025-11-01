@@ -17,8 +17,12 @@ export const trackEvent = (eventName: string, parameters?: Record<string, any>) 
       ...parameters
     });
     
-    // Also log to console for debugging
-    console.log('GA Event:', eventName, parameters);
+    // Log event for debugging (sanitized)
+    console.log('GA Event tracked:', {
+      event: eventName,
+      category: parameters?.event_category || 'engagement',
+      timestamp: new Date().toISOString()
+    });
   }
 };
 
@@ -29,7 +33,10 @@ export const trackPageView = (pageName: string, pageUrl?: string) => {
       page_location: pageUrl || window.location.href,
     });
     
-    console.log('GA Page View:', pageName, pageUrl);
+    console.log('GA Page View tracked:', {
+      page: pageName,
+      timestamp: new Date().toISOString()
+    });
   }
 };
 
@@ -80,9 +87,7 @@ export const trackContactClick = (contactType: 'email' | 'linkedin' | 'share', p
 // Test function to verify GA is working
 export const testGoogleAnalytics = () => {
   if (typeof window !== 'undefined') {
-    console.log('Testing Google Analytics...');
-    console.log('gtag function exists:', typeof window.gtag === 'function');
-    console.log('dataLayer exists:', Array.isArray(window.dataLayer));
+    console.log('Testing Google Analytics configuration');
     
     // Send a test event
     trackEvent('ga_test', {
@@ -91,11 +96,13 @@ export const testGoogleAnalytics = () => {
       value: 1
     });
     
-    return {
+    const result = {
       gtagExists: typeof window.gtag === 'function',
       dataLayerExists: Array.isArray(window.dataLayer),
       dataLayerLength: window.dataLayer?.length || 0
     };
+    console.log('GA Test Results:', result);
+    return result;
   }
   return null;
 };

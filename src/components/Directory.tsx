@@ -67,16 +67,21 @@ export function Directory({ activeTab, searchQuery, filters, onViewFullProfile }
       const { data, error } = await query
 
       if (error) {
-        console.error('Supabase error:', error)
-        console.error('Error details:', error.message, error.details, error.hint)
+        console.error('Supabase error:', {
+          message: error.message,
+          code: error.code,
+          timestamp: new Date().toISOString()
+        })
         setProfiles([])
       } else {
         console.log('Fetched profiles:', data?.length || 0, 'profiles')
-        console.log('Profile data:', data)
         setProfiles(data || [])
       }
     } catch (error) {
-      console.error('Error fetching profiles:', error)
+      console.error('Error fetching profiles:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
       setProfiles([])
     } finally {
       setLoading(false)
@@ -92,7 +97,10 @@ export function Directory({ activeTab, searchQuery, filters, onViewFullProfile }
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Supabase ads error:', error)
+        console.error('Supabase ads error:', {
+          message: error.message,
+          timestamp: new Date().toISOString()
+        })
         // Add mock ads if there's an error
         const mockAds: Advertisement[] = [
           {
@@ -112,7 +120,10 @@ export function Directory({ activeTab, searchQuery, filters, onViewFullProfile }
         setAdvertisements(data || [])
       }
     } catch (error) {
-      console.error('Error fetching advertisements:', error)
+      console.error('Error fetching advertisements:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      })
       setAdvertisements([])
     }
   }

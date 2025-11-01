@@ -18,14 +18,13 @@ export const getAutoApprovalSetting = async (): Promise<boolean> => {
       .single()
 
     if (error) {
-      console.error('Error fetching auto-approval setting:', error)
-      return true // Default to auto-approve if error
+      // If setting doesn't exist, default to true (show all profiles)
+      return true
     }
 
     return data?.setting_value ?? true
   } catch (error) {
-    console.error('Error in getAutoApprovalSetting:', error)
-    return true // Default to auto-approve if error
+    return true // Default to show all profiles
   }
 }
 
@@ -41,7 +40,10 @@ export const updateAutoApprovalSetting = async (enabled: boolean): Promise<boole
       })
 
     if (error) {
-      console.error('Error updating auto-approval setting:', error)
+      console.error('Error updating auto-approval setting:', {
+        message: error.message,
+        timestamp: new Date().toISOString()
+      })
       return false
     }
 

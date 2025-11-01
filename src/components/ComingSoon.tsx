@@ -154,7 +154,19 @@ export function ComingSoon() {
           <p className="text-muted-foreground mb-4">
             Want to influence our roadmap or get early access?
           </p>
-          <button className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25">
+          <button 
+            onClick={() => {
+              try {
+                window.open('mailto:contact@cofounderbase.com?subject=Early Access Request', '_blank', 'noopener,noreferrer')
+              } catch (error) {
+                console.error('Error opening email client:', {
+                  message: error instanceof Error ? error.message : 'Unknown error',
+                  timestamp: new Date().toISOString()
+                })
+              }
+            }}
+            className="px-6 py-3 bg-gradient-to-r from-accent to-accent/80 text-black font-semibold rounded-2xl hover:from-accent/90 hover:to-accent/70 transition-all duration-200 shadow-lg shadow-accent/25"
+          >
             Join Our Community
           </button>
         </motion.div>

@@ -54,7 +54,10 @@ const preloadProfiles = async () => {
       cacheTimestamp = now
     }
   } catch (error) {
-    console.error('Error preloading profiles:', error)
+    console.error('Error preloading profiles:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    })
   }
   
   return profileCache
@@ -120,7 +123,10 @@ function App() {
             return
           }
         } catch (err) {
-          console.error('Error fetching profile:', err)
+          console.error('Error fetching profile:', {
+            message: err instanceof Error ? err.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+          })
         }
         // If profile not found, redirect to home
         window.history.pushState({}, '', '/')
@@ -185,7 +191,10 @@ function App() {
             return
           }
         } catch (err) {
-          console.error('Error fetching profile:', err)
+          console.error('Error fetching profile:', {
+            message: err instanceof Error ? err.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+          })
         }
       }
       

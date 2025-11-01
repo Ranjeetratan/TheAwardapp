@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
+import { useTheme } from '../lib/theme.tsx'
 
 export function Logo() {
+  const { theme } = useTheme()
+  
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
@@ -19,8 +22,8 @@ export function Logo() {
           >
             <defs>
               <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#f1fb48"/>
-                <stop offset="100%" stopColor="#e6f030"/>
+                <stop offset="0%" stopColor="#10b981"/>
+                <stop offset="100%" stopColor="#059669"/>
               </linearGradient>
             </defs>
             <circle cx="10" cy="12" r="3" fill="url(#logoGradient)" opacity="0.9"/>
@@ -33,7 +36,7 @@ export function Logo() {
           </svg>
         </div>
       </div>
-      <span className="text-xl font-light tracking-wide text-white">
+      <span className={`text-xl font-light tracking-wide ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
         cofounder<span className="font-bold">Base</span>
       </span>
     </motion.div>

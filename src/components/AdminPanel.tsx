@@ -211,8 +211,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     setLoading(true)
     try {
       console.log('Fetching profiles from Supabase...')
-      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL)
-      console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_KEY)
+      console.log('Supabase configuration check completed')
       
       const { data, error } = await supabase
         .from('profiles')
@@ -220,13 +219,16 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error fetching profiles:', error)
-        console.log('Supabase error details:', error)
-        alert(`Database error: ${error.message}. Please check your Supabase configuration.`)
+        console.error('Error fetching profiles:', {
+          message: error.message,
+          code: error.code,
+          timestamp: new Date().toISOString()
+        })
+        alert('Database error. Please check your configuration.')
         setProfiles([])
         calculateStats([])
       } else {
-        console.log('Successfully fetched profiles:', data?.length || 0, data)
+        console.log('Successfully fetched profiles:', data?.length || 0)
         setProfiles(data || [])
         calculateStats(data || [])
       }
@@ -326,7 +328,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         .eq('id', profileId)
 
       if (error) {
-        console.error('Error approving profile:', error)
+        console.error('Error approving profile:', {
+          message: error.message,
+          timestamp: new Date().toISOString()
+        })
         alert('Error approving profile. Please try again.')
       } else {
         // Update local state
@@ -352,7 +357,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
             alert('Profile approved successfully! (Email notification failed - check Loop configuration)')
           }
         } catch (emailError) {
-          console.error('Email notification error:', emailError)
+          console.error('Email notification error:', {
+            message: emailError instanceof Error ? emailError.message : 'Unknown error',
+            timestamp: new Date().toISOString()
+          })
           alert('Profile approved successfully! (Email notification failed)')
         }
       }
@@ -376,11 +384,14 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         .eq('id', profileId)
         .select()
 
-      console.log('Delete response:', { data, error })
+      console.log('Profile deletion completed')
 
       if (error) {
-        console.error('Error deleting profile:', error)
-        alert(`Error deleting profile: ${error.message}`)
+        console.error('Error deleting profile:', {
+          message: error.message,
+          timestamp: new Date().toISOString()
+        })
+        alert('Error deleting profile. Please try again.')
       } else {
         console.log('Profile deleted successfully')
         const updatedProfiles = profiles.filter(p => p.id !== profileId)
@@ -403,7 +414,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         .eq('id', profileId)
 
       if (error) {
-        console.error('Error updating featured status:', error)
+        console.error('Error updating featured status:', {
+          message: error.message,
+          timestamp: new Date().toISOString()
+        })
       } else {
         setProfiles(prev => prev.map(p => 
           p.id === profileId ? { ...p, featured: !featured } : p
@@ -428,7 +442,10 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
         .select()
 
       if (error) {
-        console.error('Error creating advertisement:', error)
+        console.error('Error creating advertisement:', {
+          message: error.message,
+          timestamp: new Date().toISOString()
+        })
       } else {
         setAdvertisements(prev => [data[0], ...prev])
         setNewAd({
