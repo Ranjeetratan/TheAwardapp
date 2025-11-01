@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Card, CardContent } from './ui/card'
-import { ArrowLeft, MapPin, Clock, Briefcase, User, Star, Globe, Calendar, Plus, Share2 } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, User, Star, Globe, Calendar, Plus, Share2 } from 'lucide-react'
 import { useTheme } from '../lib/theme.tsx'
 import { supabase } from '../lib/supabase'
 import type { Profile } from '../lib/supabase'
@@ -25,13 +25,13 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name, role, headshot_url, location')
+        .select('*')
         .eq('approved', true)
         .neq('id', profile.id)
         .limit(3)
 
       if (!error && data) {
-        setSuggestedProfiles(data)
+        setSuggestedProfiles(data as Profile[])
       }
     } catch (error) {
       console.error('Error fetching suggested profiles:', error)
@@ -63,8 +63,10 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
     }
   }
 
-  const handleProfileClick = (profileId: string) => {
-    window.location.href = `/profile/${profileId}`
+  const handleProfileClick = (profileId: string | undefined) => {
+    if (profileId) {
+      window.location.href = `/profile/${profileId}`
+    }
   }
 
   return (
