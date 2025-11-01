@@ -39,7 +39,7 @@ export const sendProfileLiveEmail = async (profileData: LoopEmailData): Promise<
     })
 
     if (!response.ok) {
-      const errorText = await response.text()
+      await response.text()
       console.error('Loop email API error:', {
         status: response.status,
         statusText: response.statusText,
@@ -48,7 +48,7 @@ export const sendProfileLiveEmail = async (profileData: LoopEmailData): Promise<
       return false
     }
 
-    const result = await response.json()
+    await response.json()
     console.log('Profile live email sent successfully')
     return true
 

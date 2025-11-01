@@ -378,7 +378,7 @@ export function AdminPanel({ onLogout }: AdminPanelProps) {
     
     try {
       console.log('Attempting to delete profile with ID:', profileId)
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
         .delete()
         .eq('id', profileId)
