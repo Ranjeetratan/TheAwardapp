@@ -11,7 +11,7 @@ import type { Profile } from './lib/supabase'
 // Global profile cache for better performance
 let profileCache: Profile[] = []
 let cacheTimestamp = 0
-const CACHE_DURATION = 30 * 1000 // 30 seconds (reduced for immediate updates)
+const CACHE_DURATION = 5 * 1000 // 5 seconds for immediate updates
 
 // Function to clear cache (useful for debugging)
 const clearProfileCache = () => {
@@ -47,7 +47,6 @@ const preloadProfiles = async () => {
     const { data, error } = await query
       .order('featured', { ascending: false })
       .order('created_at', { ascending: false })
-      .limit(50)
 
     if (!error && data) {
       profileCache = data
@@ -83,14 +82,28 @@ function App() {
       const path = window.location.pathname
       const hash = window.location.hash
       
-      // Check for admin route
+      // Check for admin route - ALWAYS require password
       if (path === '/admin' || hash === '#admin') {
+        // Force logout if trying to access admin without proper auth
         const isAuthenticated = localStorage.getItem('adminAuthenticated') === 'true'
+        const authTimestamp = localStorage.getItem('adminAuthTimestamp')
+        const now = Date.now()
         
-        if (isAuthenticated) {
+        // Check if auth is expired (2 hours)
+        if (authTimestamp && (now - parseInt(authTimestamp)) > 2 * 60 * 60 * 1000) {
+          localStorage.removeItem('adminAuthenticated')
+          localStorage.removeItem('adminAuthTimestamp')
+          setShowAdminLogin(true)
+          setIsAdminAuthenticated(false)
+          return
+        }
+        
+        if (isAuthenticated && authTimestamp) {
           setIsAdminAuthenticated(true)
           setShowAdminLogin(false)
         } else {
+          localStorage.removeItem('adminAuthenticated')
+          localStorage.removeItem('adminAuthTimestamp')
           setShowAdminLogin(true)
           setIsAdminAuthenticated(false)
         }
@@ -213,6 +226,7 @@ function App() {
     const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'default_password_change_me'
     if (password === adminPassword) {
       localStorage.setItem('adminAuthenticated', 'true')
+      localStorage.setItem('adminAuthTimestamp', Date.now().toString())
       setIsAdminAuthenticated(true)
       setShowAdminLogin(false)
       window.location.hash = 'admin'
@@ -223,6 +237,7 @@ function App() {
 
   const handleAdminLogout = () => {
     localStorage.removeItem('adminAuthenticated')
+    localStorage.removeItem('adminAuthTimestamp')
     setIsAdminAuthenticated(false)
     setShowAdminLogin(false)
     window.location.hash = ''
