@@ -210,7 +210,8 @@ function App() {
   }, [])
 
   const handleAdminLogin = (password: string) => {
-    if (password === 'W9@cZt7!mQ#4rTf%X2^vBp8&') {
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'default_password_change_me'
+    if (password === adminPassword) {
       localStorage.setItem('adminAuthenticated', 'true')
       setIsAdminAuthenticated(true)
       setShowAdminLogin(false)

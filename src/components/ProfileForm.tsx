@@ -955,7 +955,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
         >
-          <Card className={`backdrop-blur-xl border shadow-2xl transition-all duration-300 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+          <Card className={`backdrop-blur-xl border shadow-lg transition-all duration-300 ${theme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className={`text-2xl sm:text-3xl font-bold text-center ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
                 Join the Base

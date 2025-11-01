@@ -92,6 +92,13 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
               </Button>
+              <Button
+                onClick={() => window.location.href = '/'}
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Submit Profile
+              </Button>
             </div>
           </div>
         </div>
@@ -335,22 +342,7 @@ export function ProfilePage({ profile, onBack }: ProfilePageProps) {
         </motion.div>
       </div>
 
-      {/* Floating Submit Profile Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-        className="fixed bottom-6 right-6 z-50"
-      >
-        <Button
-          onClick={() => window.location.href = '/#join-form'}
-          className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25 px-6 py-3 rounded-full font-semibold"
-          size="lg"
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          Submit Profile
-        </Button>
-      </motion.div>
+
     </div>
   )
 }
