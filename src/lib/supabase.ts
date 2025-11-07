@@ -21,6 +21,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 
 export type Profile = {
   id?: string
+  user_id?: string
   full_name: string
   email: string
   headshot_url?: string

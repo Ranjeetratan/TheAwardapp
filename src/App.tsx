@@ -4,6 +4,7 @@ import { ProfilePage } from './components/ProfilePage'
 import { AdminPanel } from './components/AdminPanel'
 import { AdminLogin } from './components/AdminLogin'
 import { SupportButton } from './components/SupportButton'
+import { AuthProvider } from './contexts/AuthContext'
 import { supabase } from './lib/supabase'
 import { getAutoApprovalSetting } from './lib/settings'
 import type { Profile } from './lib/supabase'
@@ -298,4 +299,12 @@ function App() {
   )
 }
 
-export default App
+function AppWithAuth() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  )
+}
+
+export default AppWithAuth

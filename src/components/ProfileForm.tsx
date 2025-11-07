@@ -6,6 +6,8 @@ import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { Label } from './ui/label'
 import { useTheme } from '../lib/theme.tsx'
+import { useAuth } from '../contexts/AuthContext'
+import { Auth } from './Auth'
 import { supabase, type Profile } from '../lib/supabase'
 import { sendProfileLiveEmail, getFirstName, generateProfileUrl } from '../lib/loop-email'
 import { getAutoApprovalSetting } from '../lib/settings'
@@ -17,7 +19,22 @@ interface ProfileFormProps {
 
 export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
   const { theme } = useTheme()
+  const { user, loading: authLoading } = useAuth()
+  const [showAuth, setShowAuth] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  
+  // Show auth screen if user is not logged in
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+      </div>
+    )
+  }
+  
+  if (!user || showAuth) {
+    return <Auth onSuccess={() => setShowAuth(false)} defaultMode="signup" />
+  }
   const [role, setRole] = useState<'founder' | 'cofounder' | 'investor' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -194,6 +211,7 @@ export function ProfileForm({ onSuccess }: ProfileFormProps = {}) {
       const autoApprove = await getAutoApprovalSetting()
 
       const profileData: Omit<Profile, 'id' | 'created_at'> = {
+        user_id: user?.id, // Link profile to authenticated user
         full_name: formData.full_name,
         email: formData.email,
         headshot_url: headshotUrl || undefined,
